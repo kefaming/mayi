@@ -1,0 +1,142 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="ruxuenian" class="layui-form-label"><span class="x-red">*</span>参考年级</label>
+		<div class="layui-input-block">
+			<select id="ruxuenian" name="ruxuenian" lay-verify="required">
+			</select>
+		</div>
+	</div>
+	<input id="nianjiname" name="nianjiname" value="" type="hidden">
+	<div class="layui-form-item">
+		<label for="sbjtable" class="layui-form-label"><span class="x-red">*</span>学科分数线</label>
+		<div class="layui-input-block">
+			{php}
+				$sbj = new \app\teach\model\Subject;
+				$src = [
+				'status' => 1,
+				'kaoshi' => 1,
+				'all' => true
+				];
+				$subject = $sbj->search($src);
+			{/php}
+			<table class="layui-table" lay-skin="line" lay-size="sm" id="sbjtable">
+				<thead>
+					<tr>
+						<th>选择</th>
+						<th>学科</th>
+						<th>满分</th>
+						<th>优秀分数线</th>
+						<th>良好分数线</th>
+						<th>及格分数线</th>
+						<th>优秀人数比</th>
+						<th>良好人数比</th>
+						<th>及格人数比</th>
+					</tr>
+				</thead>
+				<tbody>
+					{volist name="subject" id="vo"}
+					<tr>
+						<td>
+							<input type="checkbox" id="{$vo.lieming}" action="btmOnclick" name="subject_id[{$vo.id}]" lay-skin="primary" value="{$vo.id}">
+						</td>
+						<td>{$vo.title}</td>
+						<td><input type="text" title="manfen" name="manfen[{$vo.id}]" placeholder="满分" lay-skin="primary" class="layui-input"></td>
+						<td><input type="text" name="youxiu[{$vo.id}]" placeholder="优秀分" lay-skin="primary" class="layui-input"></td>
+						<td><input type="text" name="lianghao[{$vo.id}]" placeholder="良好分" lay-skin="primary" class="layui-input"></td>
+						<td><input type="text" name="jige[{$vo.id}]" placeholder="及格分" lay-skin="primary" class="layui-input"></td>
+						<td><input type="text" name="youxiubi[{$vo.id}]" placeholder="0-100整数" lay-skin="primary" class="layui-input"></td>
+						<td><input type="text" name="lianghaobi[{$vo.id}]" placeholder="0-100整数" lay-skin="primary" class="layui-input"></td>
+						<td><input type="text" name="jigebi[{$vo.id}]" placeholder="0-100整数" lay-skin="primary" class="layui-input"></td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<input id="kaoshi_id" name="kaoshi_id" value="{$list.set.kaoshi_id}" type="hidden">
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['form', 'createInput'], function() {
+	var laydate = layui.laydate,
+		form = layui.form,
+		cInput = layui.createInput;
+
+	cInput.nanjiSelect('ruxuenian', { riqi: "{$list.enddate}" });
+
+	// 监听年级
+	form.on('select()', function(data) {
+		$('#nianjiname').val($(data.elem).find("option:selected").text());
+		$('#sbjtable').find("input[type='checkbox']").prop('checked', false);
+		$('#sbjtable').find("input[type='text']").val('');
+		form.render();
+	});
+
+	form.on('checkbox()', function(data) {
+		var tr = $(data.elem).parents('tr');
+		check = data.elem.checked;
+		text = tr.find("input[type='text']");
+		if (check == true) {
+			val = 100;
+			text.eq(0).val(val);
+			text.eq(1).val((val * 0.9).toFixed(1));
+			text.eq(2).val((val * 0.75).toFixed(1));
+			text.eq(3).val((val * 0.6).toFixed(1));
+			text.eq(4).val(10);
+			text.eq(5).val(25);
+			text.eq(6).val(60);
+		} else {
+			text.val('');
+		}
+	});
+
+	// 监听满分文本框
+	$("[title^='manfen']").on("input", function(obj) {
+		tr = $(obj.delegateTarget).parents("tr");
+		val = $(obj.delegateTarget).val();
+		checkbox = tr.find("input[type='checkbox']");
+		text = tr.find("input[type='text']");
+		if (isRealNum(val)) {
+			// 选中复选框
+			checkbox.eq(0).prop('checked', true);
+			// 设置优秀率和及格率
+			text.eq(1).val((val * 0.9).toFixed(1));
+			text.eq(2).val((val * 0.75).toFixed(1));
+			text.eq(3).val((val * 0.6).toFixed(1));
+			text.eq(4).val(Math.round(10));
+			text.eq(5).val(Math.round(25));
+			text.eq(6).val(Math.round(60));
+		} else {
+			// 选中复选框
+			checkbox.eq(0).prop('checked', false);
+			text.val('');
+		}
+		// 重载表格
+		form.render();
+	});
+
+	// 判断输入是否为数字
+	function isRealNum(val) {
+		// isNaN()函数 把空串 空格 以及NUll 按照0来处理 所以先去除
+		if (val === "" || val == null) {
+			return false;
+		}
+		if (!isNaN(val)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+});
+
+</script>
+{/block}

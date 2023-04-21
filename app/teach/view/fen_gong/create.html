@@ -1,0 +1,106 @@
+{extend name=".././view/create.html" /}
+{block name="jscss"}
+
+{/block}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+    <label for="teacher_name" class="layui-form-label">
+      <span class="x-red">*</span>教师姓名
+    </label>
+    <div class="layui-input-block" id="teacher_id" school_id="">
+    </div>
+  </div>
+  <div class="layui-form-item">
+		<label for="xueqi_id" class="layui-form-label">
+			<span class="x-red">*</span>学期
+		</label>
+		<div class="layui-input-block">
+			<select name="xueqi_id" id="xueqi_id" lay-verify="required" class="layui-form-label" lay-filter="src">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+		<div class="layui-input-block">
+			<select name="school_id" id="school_id" lay-verify="required">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="ruxuenian" class="layui-form-label">
+			<span class="x-red">*</span>年级
+		</label>
+		<div class="layui-input-block">
+			<select name="ruxuenian" id="ruxuenian" lay-verify="required" class="layui-form-label" lay-filter="src">
+				<option value="">请选择年级</option>
+				{volist name="list.data.nianji" id="value"}
+					<option value="{$key}">{$value}</option>
+				{/volist}
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="banji_id" class="layui-form-label">
+			<span class="x-red">*</span>班级
+		</label>
+		<div class="layui-input-block" id="banji_id">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="subject_id" class="layui-form-label">
+			<span class="x-red">*</span>学科
+		</label>
+		<div class="layui-input-block" id="subject_id">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="bfdate" class="layui-form-label">
+			接任时间
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="bfdate" lay-verify="required" name="bfdate" autocomplete="off" class="layui-input " value="{$list.data.bfdate|default=''}" placeholder="接到这个任务的开始时间">
+		</div>
+	</div>
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['createInput', 'form', 'laydate'], function() {
+	var cInput = layui.createInput,
+		laydate = layui.laydate,
+		form = layui.form;
+
+	// 搜索教师
+	cInput.schoolSelect('school_id', '校级', '校级');
+	cInput.searchTeacher('teacher_id');
+	cInput.subjectCheckbox('subject_id');
+	cInput.xueqiSelect('xueqi_id',"",false);
+	
+	// 监听学校下拉菜单
+	form.on('select(src)', function(data) {
+		data = form.val("myform");
+		if (data.school_id > 0 && data.ruxuenian > 0) {
+			cInput.banjiCheckbox('banji_id', data);
+		}
+	});
+
+	form.on('checkbox(mycheackbox)', function(data) {
+		cInput.checkboxChecked(data);
+	});
+
+
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#bfdate', //指定元素
+		trigger: 'click' //采用click弹出
+	});
+});
+
+</script>
+{/block}

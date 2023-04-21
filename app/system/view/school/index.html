@@ -1,0 +1,171 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">系统管理</a>
+	<a href="">单位管理</a>
+	<a><cite>单位列表</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="searchval" class="layui-form-label">关键字</label>
+	<div class="layui-input-block">
+		<input type="text" id="searchval" name="searchval" autocomplete="off" class="layui-input" placeholder="输入关键字并回车">
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="jibie_id" class="layui-form-label">单位级别</label>
+	<div class="layui-input-block">
+		<select name="jibie_id" id="jibie_id">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="xingzhi_id" class="layui-form-label">单位性质</label>
+	<div class="layui-input-block">
+		<select name="xingzhi_id" id="xingzhi_id">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item" style="margin-bottom: 0;">
+	<label for="status" class="layui-form-label">单位状态</label>
+	<div class="layui-input-block">
+		<input type="radio" name="status" value="1" title="启用" value="" lay-skin="primary" checked="checked">
+		<input type="radio" name="status" value="0" title="禁用" value="" lay-skin="primary">
+	</div>
+</div>
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="lg"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-danger" lay-event="dels">
+				<i class="iconfont">&#xe69d;</i> 批量删除
+		</button>
+		<button class="layui-btn" lay-event="add">
+				<i class="iconfont">&#xe6b9;</i> 添加
+		</button>
+		</div>
+</script>
+<script type="text/html" id="kaoshi">
+	<input type="checkbox" myurl="{$list.kaoshi ? $list.kaoshi : url('kaoshi')}"
+		{{d.kaoshi == '能' ? "checked" :""}} id="{{d.id}}"
+		lay-skin="switch" lay-filter="kaoshi" lay-text="能|不能">
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+		<a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable', 'createInput', 'form'], function() {
+	var table = layui.table,
+		mytable = layui.mytable,
+		form = layui.form,
+		cInput = layui.createInput;
+
+	// 加载菜单
+	cInput.categorySelect('xingzhi_id', 101);
+	cInput.categorySelect('jibie_id', 102);
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'checkbox', fixed: 'left' },
+			{ field: 'title', title: '单位名称', sort: true, minWidth: 240 },
+			{ field: 'jiancheng', title: '单位简称', minWidth: 100, sort: true },
+			{
+				field: "xingzhi_id",
+				title: '性质',
+				sort: true,
+				minWidth: 100,
+				templet: function(d) {
+					var str = '';
+					if (d.dwXingzhi) {
+						str = d.dwXingzhi.title;
+					}
+					return str;
+				}
+			},
+			{
+				field: 'jibie_id',
+				title: '级别',
+				sort: true,
+				minWidth: 100,
+				templet: function(d) {
+					var str = '';
+					if (d.dwJibie) {
+						str = d.dwJibie.title;
+					}
+					return str;
+				}
+			},
+			{
+				field: 'xueduan_id',
+				title: '学段',
+				sort: true,
+				minWidth: 100,
+				templet: function(d) {
+					var str = '';
+					if (d.dwXueduan) {
+						str = d.dwXueduan.title;
+					}
+					return str;
+				}
+			},
+			{ field: 'paixu', title: '排序', sort: true },
+			{ field: 'dw_admin_count', minWidth: 100, title: '教师数', sort: true },
+			{ field: 'kaoshi', title: '组织考试', templet: '#kaoshi', sort: true, minWidth: 100 },
+			{ field: 'status', title: '状态', templet: '#status', sort: true, minWidth: 100 },
+			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 140 }
+		]
+	];
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'dels':
+				var checkStatus = table.checkStatus('mytable'); //idmytable 即为基础参数 id 对应的值
+				mytable.delAll(checkStatus, '/system/school/delete', 'mytable');
+				break;
+			case 'add':
+				xadmin.open('添加单位', '/system/school/create', '650', '500');
+				break;
+		};
+	});
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'detail': // 查看
+				layer.msg('查看' + data.id);
+				break;
+			case 'del': // 删除
+				mytable.del(obj, "/system/school/delete");
+				break;
+			case 'edit': // 编辑
+				xadmin.open('编辑单位', '/system/school/edit/' + obj.data.id, '650', '500');
+				break;
+		};
+	});
+});
+
+</script>
+{/block}

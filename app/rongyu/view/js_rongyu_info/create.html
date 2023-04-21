@@ -1,0 +1,150 @@
+{extend name=".././view/create.html" /}
+{block name="jscss"}
+{/block}
+{block name="form"}
+<div class="layui-form-item" align="center">
+	{eq name="$list.set.formpost" value="PUT" }
+	<img id="img" style="max-height: 300px;max-width: 500px" src="__UPLOAD__/{$list.data.pic|default='__UPLOAD__/rongyu_teacher/404.png'}" max="0">
+	{/eq}
+	{eq name="$list.set.formpost" value="POST" }
+	<img id="img" style="max-height: 300px;max-width: 500px" src="" max="0">
+	{/eq}
+</div>
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			图片
+		</label>
+		<div class="layui-inline">
+			<div class="layui-input-inline" style="min-width: 300px">
+				<input type="text" id="pic" name="pic" autocomplete="off" class="layui-input " value="{$list.data.pic|default=''}" placeholder="地址" readonly>
+			</div>
+			<div class="layui-input-inline" style="min-width: 100px">
+				<button type="button" class="layui-btn" id="upload">
+					<i class="layui-icon">&#xe67c;</i>上传图片
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			<span class="x-red">*</span>荣誉标题
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="title" name="title" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="中文1-100个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="bianhao" class="layui-form-label">
+			荣誉编号
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="bianhao" name="bianhao" autocomplete="off" class="layui-input " value="{$list.data.bianhao|default=''}" placeholder="">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="teacher_name" class="layui-form-label">
+			<span class="x-red">*</span>获奖人
+		</label>
+		<div class="layui-input-block" id="hjteachers" school_id="">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="cyteachers" class="layui-form-label">
+			参与人
+		</label>
+		<div class="layui-input-block" id="cyteachers" school_id="">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="hjschool_id" class="layui-form-label">
+			<span class="x-red">*</span>所属单位
+		</label>
+		<div class="layui-input-block">
+			<select name="hjschool_id" id="hjschool_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="subject_id" class="layui-form-label">
+			<span class="x-red">*</span>所属学科
+		</label>
+		<div class="layui-input-block">
+			<select name="subject_id" id="subject_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="jiangxiang_id" class="layui-form-label">
+			<span class="x-red">*</span>奖项
+		</label>
+		<div class="layui-input-block">
+			<select name="jiangxiang_id" id="jiangxiang_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="hjshijian" class="layui-form-label">
+			获奖时间
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="hjshijian" name="hjshijian" autocomplete="off" class="layui-input " value="{$list.data.hjshijian|default=''}" placeholder="默认获奖时间与荣誉册获奖时间相同">
+		</div>
+	</div>
+	<input type="hidden" name="rongyuce_id" id="rongyuce_id" value="{$list.set.rongyuce|default=''}">
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+// 日期控件
+layui.use(['laydate', 'createInput'], function() {
+	var laydate = layui.laydate,
+		cInput = layui.createInput;
+
+	cInput.categorySelect('category_id', 112, "{$list.data.category_id|default=''}");
+	cInput.schoolSelect('hjschool_id', '校级', '区级', "{$list.data.hjschool_id|default=''}");
+	cInput.subjectSelect('subject_id', "{$list.data.subject_id|default=''}");
+	cInput.categorySelect('jiangxiang_id', 113, "{$list.data.jiangxiang_id|default=''}");
+	cInput.uploadPic('upload', "/rongyu/danwei/upload", '教师荣誉', 'rongyu_teacher', 'pic');
+
+	// 搜索教师
+	hj = cInput.searchTeacher('hjteachers');
+	cy = cInput.searchTeacher('cyteachers');
+
+	// 添加已有表单值
+	formpost = "{$list.set.formpost|default=''}".toLocaleUpperCase();
+	if (formpost == 'PUT') {
+		data = {
+			rongyu_id: "{$list.data.id|default=''}",
+			category_id: 11901
+		}
+		cInput.loadTeacher(hj, '/rongyu/jsryinfo/srccy', data);
+
+		data = {
+			rongyu_id: "{$list.data.id|default=''}",
+			category_id: 11902
+		}
+		cInput.loadTeacher(cy, '/rongyu/jsryinfo/srccy', data);
+	}
+
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#hjshijian' //指定元素
+			,
+		trigger: 'click' //采用click弹出
+	});
+
+	// 图片放大与缩小
+	$('#img').click(function() {
+		cInput.imgMax(this);
+	})
+
+});
+
+</script>
+{/block}

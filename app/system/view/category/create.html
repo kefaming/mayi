@@ -1,0 +1,35 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			<span class="x-red">*</span>类别名称
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="title" name="title" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="中文2-25个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="p_id" class="layui-form-label">一级类别</label>
+		<div class="layui-input-block">
+			<select name="p_id" id="p_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<!-- 表格操作 -->
+<script>
+	// 提交搜索条件后重载表格
+	layui.use('createInput', function() {
+		var cInput = layui.createInput;
+		cInput.categorySelect('p_id', 0);
+	});
+</script>
+{/block}

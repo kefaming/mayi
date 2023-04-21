@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+	<meta charset="UTF-8">
+	<title>{php}echo session('webtitle'){/php}</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+	{load href="__XADMIN__/css/font.css" /}
+	{load href="__XADMIN__/css/xadmin.css" /}
+	{load href="__XADMIN__/js/jquery.min.js" /}
+	{load href="__XADMIN__/lib/layui/layui.js" /}
+	{load href="__XADMIN__/js/xadmin.js" /}
+	{load href="__XADMIN__/js/cookie.js" /}
+	{load href="__XADMIN__/js/md5.min.js" /}
+	<title>{$list.webtitle}</title>
+</head>
+
+<body>
+	<div class="x-body">
+		<fieldset class="layui-elem-field">
+			<legend>个人信息</legend>
+			<div class="layui-field-box">
+				<table class="layui-table">
+					<tbody>
+						<tr>
+							<th>帐号</th>
+							<td>{$list.username}</td>
+							<th>登录次数</th>
+							<td>{$list.denglucishu}</td>
+						</tr>
+						<tr>
+							<th width="150px">姓名</th>
+							<td>{$list.xingming}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$list.quanpin}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$list.shoupin}
+							</td>
+							<th>性别</th>
+							<td>{$list.sex}</td>
+						</tr>
+						<tr>
+							<th>用户组</th>
+							<td>
+								{$list.groupnames}
+							</td>
+							<th>最后一次登录</th>
+							<td>{$list.lastip}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								{$list.lasttime}</td>
+						</tr>
+						<tr>
+							<th>出生日期</th>
+							<td>{$list.shengri}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$list.age}周岁</td>
+							<th>参加工作时间</th>
+							<td>{$list.worktime}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$list.gongling}年工龄</td>
+						</tr>
+						<tr>
+							<th>在职状态</th>
+							<td>{$list.tuixiu}</td>
+							<th>职务</th>
+							<td>{$list.adZhiwu.title}</td>
+						</tr>
+						<tr>
+							<th>职称</th>
+							<td>{$list.adZhicheng.title}</td>
+							<th>工作单位</th>
+							<td>{$list.adSchool.title}</td>
+						</tr>
+						<tr>
+							<th>毕业院校</th>
+							<td>{$list.biye}</td>
+							<th>专业</th>
+							<td>{$list.zhuanye}</td>
+						</tr>
+						<tr>
+							<th>学历</th>
+							<td>{$list.adXueli.title}</td>
+							<th>联系电话</th>
+							<td>{$list.phone}</td>
+						</tr>
+						<tr>
+							<th>注册时间</th>
+							<td>{$list.create_time}</td>
+							<th></th>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</fieldset>
+		<fieldset class="layui-elem-field">
+			<legend>担任班主任情况</legend>
+			<div class="layui-field-box" style="width: 100%">
+				<table id="banzhuren" lay-filter="banzhuren" lay-size="sm" class="layui-table"></table>
+			</div>
+		</fieldset>
+		<fieldset class="layui-elem-field">
+			<legend>现在任课情况</legend>
+			<div class="layui-field-box" style="width: 100%">
+				<table id="renke" lay-filter="renke" lay-size="sm" class="layui-table"></table>
+			</div>
+		</fieldset>
+		<fieldset class="layui-elem-field">
+			<legend>获奖情况</legend>
+			<div class="layui-field-box" style="width: 100%">
+				<table id="rongyu" lay-filter="rongyu" lay-size="sm" class="layui-table"></table>
+			</div>
+		</fieldset>
+		<fieldset class="layui-elem-field">
+			<legend>参与课题情况</legend>
+			<div class="layui-field-box" style="width: 100%">
+				<table id="keti" lay-filter="keti" lay-size="sm" class="layui-table"></table>
+			</div>
+		</fieldset>
+		<script>
+			//config的设置是全局的
+			layui.config({
+				base: "__XADMIN__/js/" //假设这是你存放拓展模块的根目录
+			});
+
+			layui.use('table', function () {
+				var table = layui.table;
+
+				// 设置表格初始变量
+				options = {
+					elem: '#tabledemo',
+					toolbar: '#toolbarDemo',
+					url: "{$list['dataurl']}",
+					method: "POST", //数据接口
+					page: true, //开启分页
+					loading: true,
+					autoSort: false,
+					id: 'mytable',
+					defaultToolbar: ['filter'],
+					limits: [10, 25, 50, 75, 100],
+					limit: 10,
+					// width:1100,
+				};
+
+				// 监听排序
+				table.on('sort(rongyu)', function (obj) {
+					var val = {
+						'field': obj.field,
+						'order': obj.type,
+						'teacher_id': "{$list.id}"
+					};
+					ry.reload({
+						initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
+						,
+						where: val
+					})
+				});
+
+				// 监听排序
+				table.on('sort(keti)', function (obj) {
+					var val = {
+						'field': obj.field,
+						'order': obj.type,
+						'teacher_id': "{$list.id}"
+					};
+					kt.reload({
+						initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
+						,
+						where: val
+					})
+				});
+
+				//第一个实例--荣誉
+				ry = table.render(options); //获取数据并渲染
+				var ry = table.render({
+					elem: '#rongyu',
+					method: "POST" //数据接口
+					,
+					url: '/admin/info/srcry' //数据接口
+					,
+					where: {
+						'teacher_id': "{$list.id}"
+					},
+					cols: [
+						[ //表头
+							{ type: 'numbers', sort: true, width: 50, title: '序号' }, { field: 'title', sort: true, title: '荣誉标题', minWidth: 250 }, {
+								field: 'rongyuce_id',
+								title: '所属荣誉册',
+								sort: true,
+								width: 250,
+								templet: function (d) {
+									var str = '';
+									if (d.ryTuce) {
+										str = d.ryTuce.title;
+									}
+									return str;
+								}
+							}, {
+								title: '获奖人',
+								templet: function (d) {
+									var str = '';
+									if (d.hjJsry) {
+										for (var k = 0, length = d.hjJsry.length; k < length; k++) {
+											if (k == 0) {
+												str = d.hjJsry[k].teacher.xingming;
+											} else {
+												str = str + '、' + d.hjJsry[k].teacher.xingming;
+											}
+										}
+									}
+									return str;
+								}
+							}, {
+								title: '级别',
+								width: 100,
+								templet: function (d) {
+									var str = '';
+									if (d.ryTuce) {
+										str = d.ryTuce.fzSchool.dwJibie.title;
+									}
+									return str;
+								}
+							}, {
+								field: 'jiangxiang_id',
+								title: '奖项',
+								sort: true,
+								width: 100,
+								templet: function (d) {
+									var str = '';
+									if (d.jxCategory) {
+										str = d.jxCategory.title;
+									}
+									return str;
+								}
+							}, { field: 'hjshijian', sort: true, width: 120, title: '获奖时间' }, {
+								title: '发证单位',
+								minWidth: 177,
+								templet: function (d) {
+									var str = '';
+									if (d.ryTuce) {
+										str = d.ryTuce.fzSchool.title;
+									}
+									return str;
+								}
+							}
+						]
+					]
+				});
+
+				//第二个实例--课题
+				kt = table.render(options); //获取数据并渲染
+				var kt = table.render({
+					elem: '#keti',
+					method: "POST" //数据接口
+					,
+					url: '/admin/info/srckt' //数据接口
+					,
+					where: {
+						'teacher_id': "{$list.id}"
+					},
+					cols: [
+						[ //表头
+							{ field: 'id', type: 'numbers', sort: true, width: 100, title: '序号' }, { field: 'title', sort: true, title: '课题名称', minWidth: 200 }, { field: 'bianhao', sort: true, title: '课题编号' }, {
+								title: '主持人',
+								templet: function (d) {
+									var str = '';
+									if (d.ktZcr) {
+										for (var k = 0, length = d.ktZcr.length; k < length; k++) {
+											if (k == 0) {
+												str = d.ktZcr[k].teacher.xingming;
+											} else {
+												str = str + '、' + d.ktZcr[k].teacher.xingming;
+											}
+										}
+									}
+									return str;
+								}
+							}, {
+								title: '立项单位',
+								sort: true,
+								minWidth: 177,
+								templet: function (d) {
+									var str = '';
+									if (d.KtCe) {
+										if (d.KtCe.ktLxdanwei) {
+											str = d.KtCe.ktLxdanwei.jiancheng;
+										}
+									}
+									return str;
+								}
+							}, {
+								title: '级别',
+								minWidth: 177,
+								templet: function (d) {
+									var str = '';
+									if (d.KtCe) {
+										if (d.KtCe.ktLxdanwei) {
+											if (d.KtCe.ktLxdanwei.dwJibie) {
+												str = d.KtCe.ktLxdanwei.dwJibie.title;
+											}
+										}
+									}
+									return str;
+								}
+							}, {
+								field: 'jddengji_id',
+								title: '鉴定结果',
+								sort: true,
+								minWidth: 100,
+								templet: function (d) {
+									var str = '';
+									if (d.ktJdDengji) {
+										str = d.ktJdDengji.title;
+									}
+									return str;
+								}
+							},
+						]
+					]
+				});
+
+				//第三个实例--班主任
+				bzr = table.render(options); //获取数据并渲染
+				var bzr = table.render({
+					elem: '#banzhuren',
+					method: "POST" //数据接口
+					,
+					url: '/admin/info/srcbzr' //数据接口
+					,
+					where: {
+						'teacher_id': "{$list.id}"
+					},
+					cols: [
+						[ //表头
+							{ field: 'id', type: 'numbers', sort: true, width: 100, title: '序号' }, {
+								field: 'bfdate',
+								sort: true,
+								title: '任职时间',
+								minWidth: 200,
+								templet: function (d) {
+									var str = '';
+									str = d.bfdate + ' ~ ' + d.jieShu;
+									return str;
+								}
+							}, {
+								field: 'banji_id',
+								sort: true,
+								title: '任职班级',
+								minWidth: 200,
+								templet: function (d) {
+									var str = '';
+									if (d.glBanji) {
+										if (d.glBanji.banJiTitle) {
+											str = d.glBanji.banJiTitle;
+										}
+									}
+									return str;
+								}
+							}
+						]
+					]
+				});
+
+				//第四个实例--任课
+				renke = table.render(options); //获取数据并渲染
+				var bzr = table.render({
+					elem: '#renke',
+					method: "POST" //数据接口
+					,
+					url: '/admin/info/srcrk' //数据接口
+					,
+					where: {
+						'teacher_id': "{$list.id}"
+					},
+					cols: [
+						[ //表头
+							{
+								field: 'id', type: 'numbers', sort: true, width: 100, title: '序号'
+							}, {
+								field: 'bfdate',
+								sort: true,
+								title: '任职时间',
+								minWidth: 200,
+								templet: function (d) {
+									var str = '';
+									str = d.bfdate;
+									return str;
+								}
+							}, {
+								field: 'banji_id',
+								sort: true,
+								title: '任课班级',
+								minWidth: 200,
+								templet: function (d) {
+									var str = '';
+									if (d.fgBanji) {
+										if (d.fgBanji.banjiTitle) {
+											str = d.fgBanji.banjiTitle;
+										}
+									}
+									return str;
+								}
+							}
+							, {
+								field: 'subject_id',
+								sort: true,
+								title: '学科',
+								minWidth: 200,
+								templet: function (d) {
+									var str = '';
+									if (d.fgSubject) {
+										if (d.fgSubject.title) {
+											str = d.fgSubject.title;
+										}
+									}
+									return str;
+								}
+							}
+						]
+					]
+				});
+
+			});
+
+
+
+		</script>
+</body>
+
+</html>

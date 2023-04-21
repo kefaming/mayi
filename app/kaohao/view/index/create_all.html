@@ -1,0 +1,61 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="school_id" class="layui-form-label">学校</label>
+		<div class="layui-input-block">
+			<select name="school_id" id="school_id" lay-filter="src">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="ruxuenian" class="layui-form-label">年级</label>
+		<div class="layui-input-block">
+			<select name="ruxuenian" id="ruxuenian" lay-filter="src">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item" style="margin-bottom: 0;">
+		<label for="banji_id" class="layui-form-label" style="height: 100%">班级</label>
+		<div class="layui-input-block" id="banji_id">
+		</div>
+	</div>
+	<input type="hidden" name="kaoshi_id" id="kaoshi_id" value="{$list.set.kaoshi_id}">
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['form', 'createInput', 'canyuKaoshi'], function() {
+	var form = layui.form,
+		cInput = layui.createInput,
+		canyu = layui.canyuKaoshi;
+
+	cInput.schoolSelect('school_id', '校级', '校级', "{$list.data.school_id|default=''}", true);
+	canyu.gradeSelect('ruxuenian', "{$list.set.kaoshi_id}");
+
+	form.on('select(src)', function(data) {
+		data = form.val("myform");
+		data.auth = {
+			'guanliyuan' : true
+            ,'zhiwu' : true
+            ,'zuzhang' : true
+            ,'banzhuren' : true
+		}
+		if (data.school_id > 0 && data.ruxuenian > 0) {
+			cInput.banjiCheckbox('banji_id', data);
+		}
+	});
+
+	form.on('checkbox(mycheackbox)', function(data) {
+		cInput.checkboxChecked(data);
+	});
+
+});
+
+</script>
+{/block}

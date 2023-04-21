@@ -1,0 +1,160 @@
+
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+  <a href="">考试管理</a>
+  <a><cite>考试设置</cite></a>
+</span>
+{/block}
+{block name="search"}
+<input type="hidden" name="kaoshi_id" id="kaoshi_id" value="{$list.kaoshi_id}">
+<div class="layui-form-item">
+  <label for="ruxuenian" class="layui-form-label">年级</label>
+  <div class="layui-input-block">
+    <select name="ruxuenian" id="ruxuenian">
+    </select>
+  </div>
+</div>
+<div class="layui-form-item">
+  <label for="subject_id" class="layui-form-label">学科</label>
+  <div class="layui-input-block" id="subject_id">
+  </div>
+</div>
+<div class="layui-form-item" style="text-align: right;">
+  <button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-danger" lay-event="dels">
+      <i class="iconfont">&#xe69d;</i> 批量删除
+    </button>
+    <button class="layui-btn" lay-event="add">
+      <i class="iconfont">&#xe6b9;</i> 添加
+    </button>
+  </div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+  <a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+  <a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon layui-icon-edit"></i></a>
+  <a class="layui-btn-xs" lay-event="tongji" title="统计得分率"><i class="layui-icon layui-icon-chart"></i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+  // 提交搜索条件后重载表格
+  layui.use(['table','mytable','form','canyuKaoshi', 'createInput'],function(){
+      var table = layui.table,
+        mytable = layui.mytable,
+        form = layui.form,
+        canyu = layui.canyuKaoshi,
+        cInput = layui.createInput;
+
+        canyu.gradeSelect('ruxuenian', {$list.kaoshi_id});
+        data = {
+          kaoshi_id:"{$list.kaoshi_id}",
+          ruxuenian:form.val("search").ruxuenian
+        };
+        canyu.subjectCheckbox('subject_id', data);
+
+  // 设置列
+  options.cols=[[ //表头
+    {type:'checkbox', fixed: 'left'},
+    {field: 'nianji', title: '年级',sort: true, fixed: 'left',templet:function(d){
+      var str='';
+      if(d.nianjiname)
+      {
+        str = d.nianjiname;
+      }
+      return str;
+    }},
+    {field: "subject_id",title: '考试学科',sort: true, fixed: 'left',templet:function(d){
+      var str='';
+      if(d.subjectName)
+      {
+        str = d.subjectName.title;
+      }
+      return str;
+    }},
+    {field: 'manfen', title: '满分线',sort: true} ,
+    {field: 'youxiu', title: '优秀线',sort: true},
+    {field: 'lianghao', title: '良好线',sort: true},
+    {field: 'jige', title: '及格线',sort: true},
+    {field: 'youxiubi', title: '优秀人数比',sort: true},
+    {field: 'lianghaobi', title: '良好人数比',sort: true},
+    {field: 'jigebi', title: '及格人数比',sort: true},
+    {field: 'status', title: '状态', minWidth:80,templet:'#status', sort: true},
+    {field: 'id', title: '操作',toolbar: '#barDemo',minWidth:100},
+  ]];
+
+  // 获取筛选条件并加载表格
+  options.where = form.val("search");
+  userTable = table.render(options); //获取数据并渲染
+
+      //表头工具栏事件
+      table.on('toolbar(mytable)', function(obj){
+          switch(obj.event){
+            case 'dels':
+                var checkStatus = table.checkStatus('mytable'); //idmytable 即为基础参数 id 对应的值
+                mytable.delAll(checkStatus,'/kaoshi/kaoshiset/delete','mytable');
+                break;
+              case 'add':
+                xadmin.open('添加参考学科','/kaoshi/kaoshiset/create/'+"{$list.kaoshi_id}",'650','400', true);
+                break;
+          };
+      });
+
+      //监听行工具条
+      table.on('tool(mytable)', function(obj){
+          var data = obj.data; //获得当前行数据
+          var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+          var tr = obj.tr; //获得当前行 tr 的DOM对象
+          switch(layEvent){
+            case 'del':// 删除
+              mytable.del(obj,"/kaoshi/kaoshiset/delete");
+              break;
+            case 'tongji':// 编辑
+              defenlv(obj.data);
+              break;
+            case 'edit':// 编辑
+              xadmin.open('编辑','/kaoshi/kaoshiset/edit/'+obj.data.id,'650','400', false);
+              break;
+        };
+    });
+
+    form.on('checkbox(mycheackbox)', function(data) {
+      cInput.checkboxChecked(data);
+    });
+
+
+    // 统计成绩
+    function defenlv(obj){
+      var val;
+      val = {
+        'kaoshi_id':obj.kaoshi_id
+        ,'subject_id':obj.subject_id
+        ,'ruxuenian':obj.ruxuenian
+      }
+      $.ajax({
+        url:'/chengji/tongji/editdfl',
+        data:val,
+        type:'POST',
+        success: function(data, status) {
+          layer.msg(data.msg);
+        },
+        error: function(data, status) {
+          layer.msg(data.msg);
+        },
+      });
+    }
+  });
+</script>
+{/block}

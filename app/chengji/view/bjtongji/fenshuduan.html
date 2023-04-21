@@ -1,0 +1,128 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">考试管理</a>
+	<a href="">更多操作</a>
+	<a href="">成绩查看</a>
+	<a href="">各分数段统计表</a>
+	<a><cite>{$list['kaoshititle']}</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="searchval" class="layui-form-label">
+		分数段数量
+	</label>
+	<div class="layui-input-block">
+		<input type="text" id="searchval" name="cishu" autocomplete="off" class="layui-input" placeholder="默认分成20份">
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+	<div class="layui-input-block">
+		<select name="school_id" id="school_id" lay-filter="src">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="ruxuenian" class="layui-form-label"><span class="x-red">*</span>年级</label>
+	<div class="layui-input-block">
+		<select name="ruxuenian" id="ruxuenian" lay-filter="src">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="banji_id" class="layui-form-label">
+		<span class="x-red">*</span>班级
+	</label>
+	<div class="layui-input-block" id="banji_id">
+	</div>
+</div>
+<input type="hidden" name="kaoshi_id" value="{$list.kaoshi_id}">
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="srcSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+{/block}
+{block name="echart"}
+<!-- <div class="layui-row" style="padding-top: 80px;"> -->
+{volist name="list.subject_id" id="vo"}
+<div class="layui-col-xs6" style="width: 100%;height:400px;" id="myFenshuduan{$vo.lieming}"></div>
+{/volist}
+<!-- </div> -->
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+<!-- 		<button class="layui-btn layui-btn-danger" lay-event="dels">
+			<i class="iconfont">&#xe69d;</i> 批量删除
+		</button> -->
+		<button class="layui-btn" lay-event="download">
+			<i class="layui-icon layui-icon-download-circle"></i> 下载
+		</button>
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+	<a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['myEchart', 'form', 'canyuKaoshi', 'createInput','table'], function() {
+	var echart = layui.myEchart,
+		form = layui.form,
+		canyu = layui.canyuKaoshi,
+		table = layui.table,
+		cInput = layui.createInput;
+
+	canyu.schoolSelect('school_id', "{$list.kaoshi_id|default=''}");
+	canyu.gradeSelect('ruxuenian', "{$list.kaoshi_id|default=''}");
+
+	// 获取学科
+	var xk = '<?php echo json_encode($list["subject_id"]);?>';
+	xk = eval(decodeURIComponent(xk));
+
+	// 监听学校下拉菜单
+	form.on('select(src)', function(data) {
+		data = form.val("search");
+		if (data.school_id > 0 && data.ruxuenian > 0) {
+			canyu.banjiCheckbox('banji_id', data);
+		}
+	});
+
+	form.on('checkbox(mycheackbox)', function(data) {
+		cInput.checkboxChecked(data);
+	});
+
+	// 监听筛选
+  form.on('submit(srcSubmit)', function(data) {
+    options.where = form.val("search");
+    $('#srcmianban').removeClass("layui-show");
+    table.render(options); //获取数据并渲染
+    loadTubiao();
+    return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+  });
+
+	// 添加班级
+	loadTubiao();
+
+	// 加载图表
+	function loadTubiao() {
+		var val = form.val('search');
+		console.log(val);
+		$.each(xk, function(index, element) {
+			val['subject_id'] = element.id;
+			echart.fenshuduan('myFenshuduan' + element.lieming, '/chengji/bjtj/myfenshuduan', val, element.title + '分数段统计');
+		});
+	}
+
+});
+
+</script>
+{/block}

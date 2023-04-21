@@ -1,0 +1,33 @@
+{extend name=".././view/create.html" /}
+{block name="jscss"}
+{/block}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="teacher_name" class="layui-form-label">
+			<span class="x-red">*</span>教师姓名
+		</label>
+		<div class="layui-input-block" id="uid" school_id="{$list.data.school_id|default=''}">
+		</div>
+	</div>
+	<input type="hidden" id="group_id" name="group_id" value="{$list.set.group_id}">
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script type="text/javascript">
+// 监测复选框按钮
+layui.use(['form', 'createInput'], function() {
+	var form = layui.form,
+		cInput = layui.createInput;
+
+	// 搜索教师
+	cInput.searchTeacher('uid');
+});
+
+</script>
+{/block}

@@ -1,0 +1,170 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">师生名单</a>
+	<a href="">学生管理</a>
+	<a><cite>毕业学生</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="searchval" class="layui-form-label">
+		关键字
+	</label>
+	<div class="layui-input-block">
+		<input type="text" id="searchval" name="searchval" autocomplete="off" class="layui-input" placeholder="输入关键字并回车">
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="school_id" class="layui-form-label">学校</label>
+	<div class="layui-input-block">
+		<select name="school_id" id="school_id">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="ruxuenian" class="layui-form-label">毕业年</label>
+	<div class="layui-input-block">
+		<select id="ruxuenian" name="ruxuenian" lay-verify="required">
+			{volist name="$list.njlist" id="vo" key="key"}
+				<option value="{$key}">{$vo}</option>
+			{/volist}
+		</select>
+	</div>
+</div>
+<div class="layui-form-item" style="margin-bottom: 0;">
+	<label for="banji_id" class="layui-form-label" style="height: 100%">班级</label>
+	<div class="layui-input-block" id="banji">
+	</div>
+</div>
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+    <button class="layui-btn layui-btn-danger" lay-event="dels">
+      <i class="iconfont">&#xe69d;</i> 批量删除
+    </button>
+  </div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="detail" title="查看"><i class="layui-icon layui-icon-search"></i></a>
+  <a class="layui-btn-xs" lay-event="chengji" title="成绩"><i class="layui-icon layui-icon-chart-screen"></i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable', 'createInput', 'form'], function() {
+	var table = layui.table,
+		form = layui.form,
+		cInput = layui.createInput,
+		mytable = layui.mytable;
+
+	cInput.schoolSelect('school_id', '校级', '校级');
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'checkbox', fixed: 'left' },
+			{
+				title: '学校',
+				fixed: 'left', 
+				width:70,
+				templet: function(d) {
+					var str = '';
+					if (d.stuBanji) {
+						if (d.stuBanji.glSchool) {
+							if (d.stuBanji.glSchool.jiancheng) {
+								d.stuBanji.glSchool.jiancheng;
+							}
+						}
+						str = d.stuBanji.glSchool.jiancheng;
+					}
+					return str;
+				}
+			},
+			{
+				field: 'banji_id',
+				title: '班级',
+				sort: true,
+				templet: function(d) {
+					var str = '';
+					if (d.stuBanji) {
+						str = d.stuBanji.banjiTitle;
+					}
+					return str;
+				}
+			},
+			{ field: 'xingming', title: '姓名', sort: true },
+			{ field: 'sex', title: '性别', sort: true },
+			{
+				field: "shengri",
+				title: '周岁',
+				sort: true,
+				templet: function(d) {
+					return d.age;
+				}
+			},
+			{ field: 'status', title: '状态', templet: '#status', sort: true },
+			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 140 }
+		]
+	];
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'dels':
+				layer.msg('人都已经毕业了，还删他作甚?');
+				break;
+				var checkStatus = table.checkStatus('mytable'); //idmytable 即为基础参数 id 对应的值
+				mytable.delAll(checkStatus, '/student/index/delete', 'mytable');
+				break;
+		};
+	});
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'detail': // 查看
+				parent.xadmin.add_tab(obj.data.xingming + '信息', '/student/index/read/' + obj.data.id, true);
+				break;
+			case 'chengji': // 查看
+				parent.xadmin.add_tab(obj.data.xingming + '成绩', '/student/chengji/index/' + obj.data.id, true);
+				break;
+		};
+	});
+
+	form.on('select()', function(data) {
+		data = form.val("search");
+		data.auth = {
+			'zuzhang' : false
+			,'banzhuren' : false
+		}
+		if (data.school_id > 0 && data.ruxuenian > 0) {
+			cInput.banjiCheckbox('banji', data);
+		}
+	});
+
+	form.on('checkbox(mycheackbox)', function(data) {
+		cInput.checkboxChecked(data);
+	});
+});
+
+</script>
+{/block}

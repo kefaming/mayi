@@ -1,0 +1,72 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			<span class="x-red">*</span>名称
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="title" name="title" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="中文2-25个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="xuenian" class="layui-form-label">
+			<span class="x-red">*</span>学年
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="xuenian" name="xuenian" lay-verify="required" autocomplete="off" class="layui-input" value="{$list.data.xuenian|default=''}" placeholder="中文1-6个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="category_id" class="layui-form-label"><span class="x-red">*</span>类别</label>
+		<div class="layui-input-block">
+			<select name="category_id" id="category_id" lay-verify="required">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label for="title" class="layui-form-label">
+				<span class="x-red">*</span>时间范围
+			</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" id="bfdate" name="bfdate" placeholder="开始时间" autocomplete="off" value="{$list.data.bfdate|default=''}">
+			</div>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" id="enddate" name="enddate" placeholder="结束时间" autocomplete="off" value="{$list.data.enddate|default=''}">
+			</div>
+		</div>
+	</div>
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['laydate', 'createInput'], function() {
+	var laydate = layui.laydate,
+		cInput = layui.createInput;
+	cInput.categorySelect('category_id', 108, "{$list.data.category_id|default=''}");
+	//开始时间
+	laydate.render({
+		elem: '#bfdate',
+		type: 'datetime',
+		trigger: 'click' //采用click弹出
+			,
+		format: 'yyyy-M-d' //可任意组合
+	});
+	//结束时间
+	laydate.render({
+		elem: '#enddate',
+		type: 'datetime',
+		trigger: 'click' //采用click弹出
+			,
+		format: 'yyyy-M-d' //可任意组合
+	});
+});
+
+</script>
+{/block}

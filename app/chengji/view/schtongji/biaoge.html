@@ -1,0 +1,123 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">考试管理</a>
+	<a href="">更多操作</a>
+	<a href="">成绩查看</a>
+	<a href="">学校成绩统计表</a>
+	<a><cite>{$list['kaoshititle']}</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+	<div class="layui-input-block">
+		<select name="school_id" id="school_id" lay-filter="src">
+		</select>
+	</div>
+</div>
+<input type="hidden" name="kaoshi_id" value="{$list.kaoshi_id}">
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-danger" lay-event="dels">
+			<i class="iconfont">&#xe69d;</i> 批量删除
+		</button>
+		<button class="layui-btn" lay-event="download">
+	      <i class="layui-icon layui-icon-download-circle"></i> 下载
+	    </button>
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+	<a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable'], function() {
+	var table = layui.table
+	mytable = layui.mytable;
+
+	canyu.schoolSelect('school_id', "{$list.kaoshi_id|default=''}");
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'numbers', title: '序号', rowspan: 2 },
+			{ field: 'school', title: '学校', minWidth: 80, rowspan: 2 },
+		],
+		[]
+	];
+	// 获取学科
+	var xk = '<?php echo json_encode($list["subject"]);?>';
+	xk = eval(decodeURIComponent(xk));
+	var xiangmu = { cj_cnt: '参考人数', avg: '平均分', jigelv: '及格率%', youxiulv: '优秀率%' }; // 要显示哪些统计结果
+
+	$.each(xk, function(index, value) {
+		options.cols[0].push({ title: xk[index].subjectName.title + '(' + xk[index].manfen + ')', colspan: 4, align: 'center' });
+		$.each(xiangmu, function(i, val) {
+			var colname = xk[index].subjectName.lieming;
+			// console.log(colname + ' ' + i);
+			var colinfo = {
+				title: val,
+				minWidth: 100,
+				templet: function(d) {
+					var str = d.chengji[colname][i];
+					if (str == null) {
+						str = '';
+					}
+					return str;
+				}
+			};
+			options.cols[1].push(colinfo);
+		});
+	});
+	options.cols[0].push({
+		title: '全科及格率%',
+		minWidth: 120,
+		rowspan: 2,
+		templet: function(d) {
+			var str = d.quanke.jigelv;
+			return str;
+		}
+	});
+	options.cols[0].push({
+		title: '总平均分',
+		minWidth: 100,
+		rowspan: 2,
+		templet: function(d) {
+			var str = d.quanke.avg;
+			return str;
+		}
+	});
+	options.autoSort = true;
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'download':
+				xadmin.open('下载成绩', '/chengji/schtj/dwbiaoge/{$list.kaoshi}', '650', '300');
+				break;
+		};
+	});
+
+});
+
+</script>
+{/block}

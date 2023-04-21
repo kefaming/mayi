@@ -1,0 +1,240 @@
+{extend name=".././view/create.html" /}
+{block name="jscss"}
+{load href="__MAYI__/js/Convert_Pinyin.js" /}
+{/block}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+  <div class="layui-form-item">
+    <label for="xingming" class="layui-form-label">
+      <span class="x-red">*</span>用户姓名
+    </label>
+    <div class="layui-input-block">
+      <input type="text" id="xingming" name="xingming" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.xingming|default=''}" placeholder="中文2-25个字符">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-inline">
+      <label class="layui-form-label">
+        <span class="x-red">*</span>姓名拼音
+      </label>
+      <div class="layui-input-inline" style="width: 35%; margin-right: 20px">
+        <input type="text" id="quanpin" name="quanpin" placeholder="全拼" autocomplete="off" class="layui-input" lay-verify="required" value="{$list.data.quanpin|default=''}">
+      </div>
+      <div class="layui-input-inline" style="width: 25%;">
+        <input type="text" id="shoupin" name="shoupin" placeholder="简拼" autocomplete="off" class="layui-input" lay-verify="required" value="{$list.data.shoupin|default=''}">
+      </div>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label for="username" class="layui-form-label">
+      <span class="x-red">*</span>帐号
+    </label>
+    <div class="layui-input-block">
+      <input type="text" id="username" name="username" lay-verify="required|username" autocomplete="off" class="layui-input" value="{$list.data.username|default=''}" placeholder="由字母和数字，下划线_及破折号- 6-12个字符">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label for="shengri" class="layui-form-label">
+      <span class="x-red">*</span>出生日期
+    </label>
+    <div class="layui-input-block">
+      <input type="text" class="layui-input" id="shengri" name="shengri" lay-verify="required" autocomplete="off" value="{$list.data.shengri|default=''}" placeholder="日期格式">
+    </div>
+  </div>
+  <div class="layui-form-item" pane>
+    <label for="sex" class="layui-form-label"><span class="x-red">*</span>性别</label>
+    <div class="layui-input-block">
+      <input type="radio" name="sex" value="1" title="男" {present name="$list.data.sex" } {$list.data.sex} {eq name="$list.data.sex" value="男" } checked {/eq} {/present}> <input type="radio" name="sex" value="0" title="女" {present name="$list.data.sex" } {eq name="list.data.sex" value="女" } checked {/eq} {/present} {notpresent name="$list.data.sex" } checked {/notpresent}> </div> </div> <div class="layui-form-item">
+      <label for="phone" class="layui-form-label">
+        <span class="x-red">*</span>电话号码
+      </label>
+      <div class="layui-input-block">
+        <input type="input" id="phone" name="phone" lay-verify="required|phone|myphone" autocomplete="off" class="layui-input" value="{$list.data.phone|default=''}" placeholder="数字">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="school_id" class="layui-form-label"><span class="x-red">*</span>工作单位</label>
+      <div class="layui-input-block">
+        <select name="school_id" id="school_id" lay-verify="required">
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item" pane>
+      <label for="group_id" class="layui-form-label"><span class="x-red">*</span>角色设置</label>
+      <div class="layui-input-block">
+        {php}
+        $authgroup = new \app\admin\model\AuthGroup;
+        $authgrouplist = $authgroup->where('status',1)->select();
+        {/php}
+        {volist name="authgrouplist" id="vo"}
+        <input type="checkbox" name="group_id[]" title="{$vo.title}" value="{$vo.id}" lay-skin="primary" {present name="$list.data.gl_group" } {volist name="list.data.gl_group" id="va" } {eq name="$va.title" value="$vo.title" }checked{/eq} {/volist} {/present}> {/volist} </select> </div> </div> <div class="layui-form-item">
+        <label for="zhiwu_id" class="layui-form-label">职务</label>
+        <div class="layui-input-block">
+          <select name="zhiwu_id" id="zhiwu_id">
+          </select>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="zhicheng_id" class="layui-form-label"><span class="x-red">*</span>职称</label>
+        <div class="layui-input-block">
+          <select name="zhicheng_id" id="zhicheng_id" lay-verify="required">
+          </select>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="xueli_id" class="layui-form-label"><span class="x-red">*</span>学历</label>
+        <div class="layui-input-block">
+          <select name="xueli_id" id="xueli_id" lay-verify="required">
+          </select>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="biye" class="layui-form-label">
+          毕业院校
+        </label>
+        <div class="layui-input-block">
+          <input type="text" id="biye" name="biye" autocomplete="off" class="layui-input " value="{$list.data.biye|default=''}" placeholder="中文2-25个字符">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="zhuanye" class="layui-form-label">
+          专业
+        </label>
+        <div class="layui-input-block">
+          <input type="text" id="zhuanye" name="zhuanye" autocomplete="off" class="layui-input " value="{$list.data.zhuanye|default=''}" placeholder="中文2-25个字符">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="worktime" class="layui-form-label">
+          <span class="x-red">*</span>入职时间
+        </label>
+        <div class="layui-input-block">
+          <input type="input" id="worktime" name="worktime" class="layui-input" value="{$list.data.worktime|default=''}" placeholder="入职时间" autocomplete="off" lay-verify="required">
+        </div>
+      </div>
+      <div class="layui-form-item" pane>
+        <label for="tuixiu" class="layui-form-label"><span class="x-red">*</span>是否已经退体</label>
+        <div class="layui-input-block">
+          {if (isset($list.data.tuixiu)) }
+          <input type="radio" name="tuixiu" value="0" title="在职" {eq name="$list.data.tuixiu" value="在职" } checked {/eq}> <input type="radio" name="tuixiu" value="1" title="退休" {eq name="$list.data.tuixiu" value="退休" } checked {/eq}> {else /} <input type="radio" name="tuixiu" value="0" title="在职" checked>
+          <input type="radio" name="tuixiu" value="1" title="退休">
+          {/if}
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="beizhu" class="layui-form-label">
+          备注
+        </label>
+        <div class="layui-input-block">
+          <input type="text" id="beizhu" name="beizhu" class="layui-input " value="{$list.data.beizhu|default=''}" placeholder="0-80个字符">
+        </div>
+      </div>
+      <div class="layui-form-item" style="text-align: right;">
+        <button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+          {$list.set.butname}
+        </button>
+      </div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['laydate', 'createInput', 'form'], function() {
+  var laydate = layui.laydate,
+    cInput = layui.createInput,
+    form = layui.form;
+
+  // 填充下拉菜单
+  cInput.schoolSelect('school_id', '校级', '区级', "{$list.data.school_id|default=''}");
+  cInput.categorySelect('zhiwu_id', 107, "{$list.data.zhiwu_id|default=''}");
+  cInput.categorySelect('zhicheng_id', 106, "{$list.data.zhicheng_id|default=''}");
+  cInput.categorySelect('xueli_id', 105, "{$list.data.xueli_id|default=''}");
+
+  //开始时间
+  laydate.render({
+    elem: '#shengri',
+    type: 'datetime',
+    trigger: 'click', //采用click弹出
+    format: 'yyyy-M-d' //可任意组合
+  });
+  //参加工作时间
+  laydate.render({
+    elem: '#worktime' //指定元素
+      ,
+    trigger: 'click' //采用click弹出
+  });
+
+  $('#xingming').blur(function() {
+    var xingming = $('#xingming').val();
+    //获取全写拼音（调用js中方法）
+    var quanpin = pinyin.getFullChars(xingming);
+    //获取简写拼音（调用js中方法）
+    var shoupin = pinyin.getCamelChars(xingming);
+    //给两个文本框赋值
+    $('#quanpin').val(quanpin);
+    $('#shoupin').val(shoupin);
+  })
+
+  form.verify({
+    //将用户名是否可用作为验证条件 表单提交时触发
+    username: function(value) {
+      var datas = {
+        searchval: value,
+        id: "{$list.data.id|default=''}"
+      };
+      var message = '';
+      $.ajax({
+        type: "POST",
+        url: '/admin/index/srcusername',
+        async: false, //改为同步请求
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(datas),
+        dataType: 'json',
+        success: function(data) {
+          if (data) {
+            if(data.val == 0){
+              message = data.msg
+            }
+          } else {
+            message = data.msg
+          }
+        }
+      });
+      //需要注意 需要将返回信息写在ajax方法外
+      if (message !== '')
+        return message;
+    },
+    //将电话号码是否可用作为验证条件 表单提交时触发
+    myphone: function(value) {
+      var datas = {
+        searchval: value,
+        id: "{$list.data.id|default=''}"
+      };
+      var message = '';
+      $.ajax({
+        type: "POST",
+        url: '/admin/index/srcphone',
+        async: false, //改为同步请求
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(datas),
+        dataType: 'json',
+        success: function(data) {
+          if (data) {
+            if(data.val == 0){
+              message = data.msg
+            }
+          } else {
+            message = data.msg
+          }
+        }
+      });
+      //需要注意 需要将返回信息写在ajax方法外
+      if (message !== '')
+        return message;
+      }
+  });
+
+
+});
+
+</script>
+{/block}

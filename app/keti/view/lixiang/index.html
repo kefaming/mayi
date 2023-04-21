@@ -1,0 +1,149 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">课题管理</a>
+	<a><cite>立项列表</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="searchval" class="layui-form-label">
+		关键字
+	</label>
+	<div class="layui-input-block">
+		<input type="text" id="searchval" name="searchval" autocomplete="off" class="layui-input" placeholder="输入关键字并回车">
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="category_id" class="layui-form-label">课题类别</label>
+	<div class="layui-input-block">
+		<select name="category_id" id="category_id">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="lxdanwei_id" class="layui-form-label">立项单位</label>
+	<div class="layui-input-block">
+		<select name="lxdanwei_id" id="lxdanwei_id">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-danger" lay-event="dels">
+			<i class="iconfont">&#xe69d;</i> 批量删除
+		</button>
+		<button class="layui-btn" lay-event="add">
+			<i class="iconfont">&#xe6b9;</i> 添加
+		</button>
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="detail" title="课题列表"><i class="layui-icon">&#xe62d;</i></a>
+	<a class="layui-btn-xs" lay-event="more" title="批传"><i class="layui-icon">&#xe67c;</i></a>
+	<a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+	<a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable', 'createInput', 'form'], function() {
+	var table = layui.table,
+		mytable = layui.mytable,
+		form = layui.form,
+		cInput = layui.createInput;
+
+	// 填充下拉菜单
+	cInput.schoolSelect('lxdanwei_id', '区级', '其它级');
+	cInput.categorySelect('category_id', 115);
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'checkbox', fixed: 'left' },
+			{ field: 'title', title: '课题名称', sort: true, minWidth: 240 },
+			{
+				field: 'lxdanwei_id',
+				title: '立项单位',
+				sort: true,
+				templet: function(d) {
+					var str = '';
+					if (d.ktLxdanwei) {
+						str = d.ktLxdanwei.title;
+					}
+					return str;
+				}
+			},
+			{
+				field: "category_id",
+				title: '课题类别',
+				sort: true,
+				templet: function(d) {
+					var str = '';
+					if (d.ktCategory) {
+						str = d.ktCategory.title;
+					}
+					return str;
+				}
+			},
+			{ field: 'lxshijian', title: '立项时间', sort: true },
+			{ field: 'lxcount', title: '课题数', sort: true },
+			{ field: 'kt_info_count', title: '已结题', sort: true },
+			{ field: 'status', title: '状态', templet: '#status', sort: true },
+			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 140 }
+		]
+	];
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'dels':
+				var checkStatus = table.checkStatus('mytable'); //idmytable 即为基础参数 id 对应的值
+				mytable.delAll(checkStatus, '/keti/lixiang/delete', 'mytable');
+				break;
+			case 'add':
+				xadmin.open('添加课题册', '/keti/lixiang/create', '600', '400');
+				break;
+		};
+	});
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'detail': // 查看
+				parent.xadmin.add_tab(obj.data.title + ' 列表', '/keti/lixiang/list/' + obj.data.id, true);
+				break;
+			case 'del': // 删除
+				mytable.del(obj, "keti/lixiang/delete");
+				break;
+			case 'edit': // 编辑
+				xadmin.open('编辑课题册', '/keti/lixiang/edit/' + obj.data.id, '600', '400');
+				break;
+			case 'more': // 状态
+				xadmin.open('批传', '/keti/info/createall/' + obj.data.id, '420', '280');
+				break;
+		};
+	});
+});
+
+</script>
+{/block}

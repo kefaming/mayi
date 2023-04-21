@@ -1,0 +1,169 @@
+{extend name=".././view/createhref.html" /}
+{block name="form"}
+<div class="x-nav">
+  <span class="layui-breadcrumb">
+    <a href="">成绩采集</a>
+    <a><cite>表格录入</cite></a>
+  </span>
+  <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+    <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+  </a>
+</div>
+<div style="padding: 10px; background-color: #F2F2F2;">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md6">
+      <div class="layui-card">
+        <div class="layui-card-header">
+          <fieldset class="layui-elem-field layui-field-title" style="margin-top: 10px;">
+            <legend>1、表格下载</legend>
+          </fieldset>
+        </div>
+        <div class="layui-card-body" style="min-height: 300px">
+          <form class="layui-form layui-form-pane" lay-filter="dwform" method="{$list.set.formpost}" action="{$list.set.url}">
+            <div class="layui-form-item">
+              <label for="kaoshi_id" class="layui-form-label"><span class="x-red">*</span>考试</label>
+              <div class="layui-input-block">
+                <select name="kaoshi_id" id="kaoshi_id" lay-filter="ks" lay-verify="required">
+                </select>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+              <div class="layui-input-block">
+                <select name="school_id" id="school_id" lay-filter="src" lay-verify="required">
+                </select>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="ruxuenian" class="layui-form-label"><span class="x-red">*</span>年级</label>
+              <div class="layui-input-block">
+                <select name="ruxuenian" id="ruxuenian" lay-filter="src" lay-verify="required">
+                </select>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="subject_id" class="layui-form-label">
+                <span class="x-red">*</span>学科
+              </label>
+              <div class="layui-input-block" id="subject_id">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="banji_id" class="layui-form-label">
+                <span class="x-red">*</span>班级
+              </label>
+              <div class="layui-input-block" id="banji_id">
+              </div>
+            </div>
+            <div class="layui-form-item" style="text-align: center;">
+              <button class="layui-btn" lay-filter="download" lay-submit="">
+                {$list.set.butname}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="layui-col-md6">
+      <div class="layui-card">
+        <div class="layui-card-header">
+          <fieldset class="layui-elem-field layui-field-title" style="margin-top: 10px;">
+            <legend>2、表格上传</legend>
+          </fieldset>
+        </div>
+        <div class="layui-card-body" style="min-height: 300px">
+          <form class="layui-form layui-form-pane" lay-filter="upform">
+            <div class="layui-form-item">
+              <label for="school" class="layui-form-label"><span class="x-red">*</span>文件地址</label>
+              <div class="layui-input-block">
+                <input type="text" id="url" name="url" autocomplete="off" class="layui-input " value="" placeholder="地址" readonly>
+              </div>
+            </div>
+            {:token_meta()}
+          </form>
+          <div class="layui-card-body layui-upload-drag" id="upload" style="min-height: 125px; width: 90%">
+            <i class="layui-icon"></i>
+            <p>点击上传，或将文件拖拽到此处</p>
+          </div>
+          <div class="layui-form-item" style="text-align: center; margin-top: 16px">
+            <button class="layui-btn" lay-filter="upload" lay-submit="">
+              导入
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div style="padding: 10px; background-color: #F2F2F2;">
+</div>
+{/block}
+{block name="myjs"}
+<script>
+// 日期控件
+layui.use(['form', 'upload', 'canyuKaoshi', 'createInput'], function() {
+  var form = layui.form,
+    upload = layui.upload,
+    canyu = layui.canyuKaoshi,
+    cInput = layui.createInput;
+
+  canyu.kaoshiSelect('kaoshi_id');
+
+  // 监听学校下拉菜单
+  form.on('select(ks)', function(data) {
+    data = form.val("dwform");
+    if (data.kaoshi_id > 0) {
+      canyu.schoolSelect('school_id', data.kaoshi_id);
+      canyu.gradeSelect('ruxuenian', data.kaoshi_id);
+    }
+  });
+
+  // 监听学校和年级下拉菜单
+  form.on('select(src)', function(data) {
+    data = form.val("dwform");
+    delete data.subject_id;
+    if (data.kaoshi_id > 0 && data.school_id > 0 && data.ruxuenian > 0) {
+      canyu.lrSubjectCheckbox('subject_id', data);
+      canyu.lrBanjiCheckbox('banji_id', data);
+    }
+  });
+
+  form.on('checkbox(mycheackbox)', function(data) {
+    cInput.checkboxChecked(data);
+  });
+
+  cInput.uploadFileMore('upload', '11103', "chengji", 'url');
+
+
+
+  // 上传
+  form.on('submit(upload)', function(data) {
+    url = $("#url").val();
+    if (url.length == 0) {
+      layer.msg('请先上传文件。');
+      return false;
+    }
+    $.ajax({
+      url: "/luru/index/saveall",
+      type: 'POST',
+      data: {
+        "url": url
+      },
+      // async:true,
+      success: function(result) {
+        if (result.val == 1) {
+          $("#url").val('');
+        }
+        layer.msg(result.msg);
+      },
+      error: function(result) {
+        layer.msg('数据扔半道啦。', function() {});
+      },
+    });
+    return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+  });
+
+});
+
+</script>
+{/block}

@@ -1,0 +1,203 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">考试管理</a>
+	<a href="">更多操作</a>
+	<a href="">成绩查看</a>
+	<a href="">各班级成绩统计表</a>
+	<a><cite>{$list['kaoshititle']}</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+	<div class="layui-input-block">
+		<select name="school_id" id="school_id" lay-filter="src">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="ruxuenian" class="layui-form-label"><span class="x-red">*</span>年级</label>
+	<div class="layui-input-block">
+		<select name="ruxuenian" id="ruxuenian" lay-filter="src">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="banji_id" class="layui-form-label">
+		<span class="x-red">*</span>班级
+	</label>
+	<div class="layui-input-block" id="banji_id">
+	</div>
+</div>
+<input type="hidden" name="kaoshi_id" value="{$list.kaoshi_id}">
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="srcSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="echart"}
+<!-- <div class="layui-row" style="padding-top: 80px;"> -->
+<div class="layui-col-xs6" style="width: 100%;height:400px;" id="myAvg"></div>
+<div class="layui-col-xs6" style="width: 100%;height:400px;" id="myJige"></div>
+<div class="layui-col-xs6" style="width: 100%;height:400px;" id="myYouxiu"></div>
+<div class="layui-col-xs6" style="width: 100%;height:400px;" id="myBiaozhunca"></div>
+<div class="layui-col-xs6" style="width: 100%;height:400px;" id="myXiangti"></div>
+<!-- </div> -->
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+<!-- 		<button class="layui-btn layui-btn-danger" lay-event="dels">
+			<i class="iconfont">&#xe69d;</i> 批量删除
+		</button> -->
+		<button class="layui-btn" lay-event="download">
+			<i class="layui-icon layui-icon-download-circle"></i> 下载
+		</button>
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+	<a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'form', 'canyuKaoshi', 'createInput', 'mytable', 'myEchart'], function() {
+	var table = layui.table,
+		mytable = layui.mytable,
+		form = layui.form,
+		cInput = layui.createInput,
+		canyu = layui.canyuKaoshi,
+		echart = layui.myEchart;
+
+	canyu.schoolSelect('school_id', "{$list.kaoshi_id|default=''}");
+	canyu.gradeSelect('ruxuenian', "{$list.kaoshi_id|default=''}");
+
+	// 监听学校下拉菜单
+	form.on('select(src)', function(data) {
+		data = form.val("search");
+		data.auth = {};
+		if (data.school_id > 0 && data.ruxuenian > 0) {
+			canyu.banjiCheckbox('banji_id', data);
+		}
+	});
+
+	form.on('checkbox(mycheackbox)', function(data) {
+		cInput.checkboxChecked(data);
+	});
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'numbers', title: '序号', rowspan: 2 },
+			{ field: 'school_jiancheng', title: '学校', sort: false, minWidth: 80, rowspan: 2 },
+			{ field: 'banji_title', title: '班级', sort: false, minWidth: 100, rowspan: 2 },
+		],
+		[]
+	];
+	// 获取学科
+	var xk = '<?php echo json_encode($list["subject_id"]);?>';
+	xk = eval(decodeURIComponent(xk));
+
+	var xiangmu = '<?php echo json_encode($list["tjxm"]);?>';
+	xiangmu = eval(decodeURIComponent(xiangmu));
+	xiangmuCnt = xiangmu.length;
+
+	$.each(xk, function(index, value) {
+		options.cols[0].push({ title: xk[index].title + '(' + xk[index].fenshuxian.manfen + ')', colspan: xiangmuCnt, align: 'center' });
+		$.each(xiangmu, function(i, val) {
+			var colname = xk[index].lieming;
+			var colinfo = {
+				title: val.title,
+				minWidth: 100,
+				templet: function(d) {
+					var str = "";
+					if (d.chengji) {
+						if (d.chengji[colname]) {
+							str = d.chengji[colname][val.biaoshi];
+						}
+					}
+					return str;
+				}
+			};
+			options.cols[1].push(colinfo);
+		});
+	});
+	options.cols[0].push({
+		title: '全科及格率%',
+		minWidth: 100,
+		rowspan: 2,
+		templet: function(d) {
+			var str = d.quanke.jigelv;
+			return str;
+		}
+	});
+	options.cols[0].push({
+		title: '总平均分',
+		minWidth: 100,
+		rowspan: 2,
+		templet: function(d) {
+			var str = d.quanke.avg;
+			return str;
+		}
+	});
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	loadTubiao()
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'download':
+				xadmin.open('下载成绩', '/chengji/bjtj/dwbiaoge/' + "{$list.kaoshi_id}", '650', '300');
+				break;
+		};
+	});
+
+	// 监听筛选
+  form.on('submit(srcSubmit)', function(data) {
+    options.where = form.val("search");
+    $('#srcmianban').removeClass("layui-show");
+    table.render(options); //获取数据并渲染
+    loadTubiao();
+    return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+  });
+
+	// 加载图表
+	function loadTubiao() {
+		var val = form.val('search');
+
+		// 条形统计图  平均分
+		val.xiangmu = 'avg';
+		echart.tiaoxing('myAvg', '/chengji/bjtj/myavg', val, '平均分');
+
+		// 条形统计图--及格率
+		val.xiangmu = 'jigelv';
+		echart.tiaoxing('myJige', '/chengji/bjtj/myavg', val, '及格率');
+
+		// 条形统计图--优秀率
+		val.xiangmu = 'youxiulv';
+		echart.tiaoxing('myYouxiu', '/chengji/bjtj/myavg', val, '优秀率');
+
+		// 条形统计图--标准差
+		val.xiangmu = 'biaozhuncha';
+		echart.tiaoxing('myBiaozhunca', '/chengji/bjtj/myavg', val, '标准差');
+
+		// 箱线图--差异
+		var val = form.val('search');
+		echart.xiangti('myXiangti', '/chengji/bjtj/myxiangti', val, '差异');
+	}
+
+});
+
+</script>
+{/block}

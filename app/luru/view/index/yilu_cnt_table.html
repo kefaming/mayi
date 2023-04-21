@@ -1,0 +1,143 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+  <a href="">考试管理</a>
+  <a href="">已录成绩统计</a>
+  <a><cite>{$list['kaoshititle']}</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+  <label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+  <div class="layui-input-block">
+    <select name="school_id" id="school_id" lay-filter="src" lay-verify="required">
+    </select>
+  </div>
+</div>
+<div class="layui-form-item">
+  <label for="ruxuenian" class="layui-form-label"><span class="x-red">*</span>年级</label>
+  <div class="layui-input-block">
+    <select name="ruxuenian" id="ruxuenian" lay-filter="src" lay-verify="required">
+    </select>
+  </div>
+</div>
+<div class="layui-form-item">
+  <label for="banji_id" class="layui-form-label">
+    <span class="x-red">*</span>班级
+  </label>
+  <div class="layui-input-block" id="banji_id">
+  </div>
+</div>
+<input type="hidden" name="kaoshi_id" value="{$list.kaoshi_id}">
+<div class="layui-form-item" style="text-align: right;">
+  <button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-danger" lay-event="dels">
+      <i class="iconfont">&#xe69d;</i> 批量删除
+    </button>
+    <button class="layui-btn" lay-event="add">
+      <i class="iconfont">&#xe6b9;</i> 添加
+    </button>
+  </div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+  <a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+  <a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'form', 'canyuKaoshi'], function() {
+  var table = layui.table,
+    mytable = layui.mytable,
+    canyu = layui.canyuKaoshi,
+    form = layui.form;
+
+  canyu.schoolSelect('school_id', "{$list.kaoshi_id|default=''}");
+  canyu.gradeSelect('ruxuenian', "{$list.kaoshi_id|default=''}");
+
+  // 监听学校下拉菜单
+  form.on('select(src)', function(data) {
+    data = form.val("search");
+    if (data.school_id > 0 && data.ruxuenian > 0) {
+      canyu.banjiCheckbox('banji_id', data);
+    }
+  });
+
+  form.on('checkbox(mycheackbox)', function(data) {
+    cInput.checkboxChecked(data);
+  });
+
+  //设置列
+  options.cols = [
+    [ //表头
+      { field: 'id', type: 'numbers', title: '序号', align: 'center', sort: false, width: 80 },
+      { field: 'school_id', title: '学校', align: 'center', sort: true, width: 80, rowspan: 2 },
+      { field: 'banji_id', title: '班级', align: 'center', sort: true, width: 130, rowspan: 2 },
+      {
+        field: 'id',
+        title: '班级人数',
+        align: 'center',
+        minWidth: 100,
+        templet: function(d) {
+          var str = '';
+          if (d.chengji) {
+            str = d.chengji.stucnt
+          }
+          return str;
+        }
+      },
+    ]
+  ];
+
+  // 获取学科
+  var xk = '<?php echo json_encode($list["subject_id"]);?>';
+  xk = eval(decodeURIComponent(xk));
+
+  $.each(xk, function(index, value) {
+    var colname = xk[index].lieming
+    coltitle = xk[index].title + '成绩数';
+    options.cols[0].push({
+      field: 'id',
+      title: coltitle,
+      minWidth: 100,
+      align: 'center',
+      templet: function(d) {
+        var str = '';
+        if (d.chengji) {
+          if (d.chengji[colname]) {
+            str = d.chengji[colname].xkcnt;
+          }
+        }
+        if (d.chengji.stucnt != str) {
+          if (str == 0) {
+            str = '';
+          } else {
+            var cha = str - d.chengji.stucnt;
+            str = str + ' <span style="color:red;">(' + cha + ')</span>'
+          }
+        }
+        return str;
+      }
+    });
+  });
+
+  //   // 获取筛选条件并加载表格
+  options.where = form.val("search");
+  userTable = table.render(options); //获取数据并渲染
+
+});
+
+</script>
+{/block}

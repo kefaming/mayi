@@ -1,0 +1,88 @@
+{extend name=".././view/create.html" /}
+{block name="jscss"}{/block}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			<span class="x-red">*</span>角色名称
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="title" name="title" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="中文2-25个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="miaoshu" class="layui-form-label">
+			<span class="x-red">*</span>角色描述
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="miaoshu" name="miaoshu" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.miaoshu|default=''}" placeholder="中文2-25个字符">
+		</div>
+	</div>
+	<div class="layui-form-item" id="rule" style="background: #eeeeee">
+	</div>
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+	<div>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script type="text/javascript">
+// 监测复选框按钮
+layui.use(['form', 'createInput'], function() {
+	var cInput = layui.createInput,
+		form = layui.form;
+
+	// 加载权限
+	auth = <?php echo json_encode($list['auth']);?>;
+	auth = eval(auth);
+	createAuth();
+
+	function createAuth() {
+		var index = layer.load(1, {
+			shade: [0.1, '#fff'] //0.1透明度的白色背景
+		});
+		createCheckbox(auth, 0);
+		form.render();
+		layer.close(index);
+	}
+
+	// 创建权限按钮
+	function createCheckbox(arr, pid) {
+		if (arr.length == 0) {
+			return false;
+		}
+		// 创建div
+		if (pid == 0) {
+			mydiv = "<div class='layui-form-item' id='p" + pid + "'></div>";
+			$('#rule').append(mydiv);
+		} else {
+			mydiv = "<div class='layui-form-item' style='margin-left: 3%; overflow:auto' id='p" + pid + "'></div>";
+			$('#' + pid).after(mydiv);
+		}
+		// 创建checkbox
+		for (var i in arr) {
+			if (arr[i].select == true) {
+				mycheckbox = '<input type="checkbox" name="rules[]" title="' + arr[i].title + '" value="' + arr[i].id + '" lay-skin="primary" lay-filter="auth" lay-verify="required" id ="' + arr[i].id + '" pid="' + arr[i].pid + '" cid="' + arr[i].id + '" checked>';
+			} else {
+				mycheckbox = '<input type="checkbox" name="rules[]" title="' + arr[i].title + '" value="' + arr[i].id + '" lay-skin="primary" lay-filter="auth" lay-verify="required" id ="' + arr[i].id + '" pid="' + arr[i].pid + '" cid="' + arr[i].id + '">';
+			}
+
+			$('#p' + pid).append(mycheckbox);
+			createCheckbox(arr[i].child, arr[i].id);
+		}
+	}
+
+	form.on('checkbox(auth)', function(data) {
+		cInput.checkboxCheckedAuth(data);
+	});
+
+});
+
+</script>
+{/block}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+	<meta charset="UTF-8">
+	<title>{$list.webtitle}</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+	{load href="__XADMIN__/css/font.css" /}
+	{load href="__XADMIN__/css/xadmin.css" /}
+	{load href="__XADMIN__/js/jquery.min.js" /}
+	{load href="__XADMIN__/lib/layui/layui.js" /}
+	{load href="__XADMIN__/js/xadmin.js" /}
+	{load href="__XADMIN__/js/cookie.js" /}
+	{load href="__XADMIN__/js/md5.min.js" /}
+	{block name="jsset"}{/block}
+	<style>
+	.point {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+	}
+
+	.pop {
+		width: 500px;
+		height: 500px;
+		position: absolute;
+		left: -250px;
+		top: -250px;
+		border: 2px solid red;
+	}
+
+	</style>
+	<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+	<!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body class="">
+	<div class="x-nav">
+		<span class="layui-breadcrumb">
+			<a href="">考试管理</a>
+			<a href="">考试列表</a>
+			<a><cite>考试操作</cite></a>
+		</span>
+		<a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+			<i class="iconfont" style="line-height:30px">&#xe6aa;</i></a>
+	</div>
+	{php}$kaoshi_id =$list['kaoshi_id']; {/php}
+	<!-- 内容开始 -->
+	<div class="layui-row" style="margin-top: 30px">
+		<div class="layui-container">
+			<a href="javascript:void(0);" onclick="addteb('学生成绩列表','/chengji/index/list/{$kaoshi_id}')" class="x-admin-backlog-body">
+				<div class="layui-col-xs6 layui-col-sm6 layui-col-md3" style="padding-top: 38px; height: 230px;" align="center">
+					<i class="layui-icon layui-icon-log" style="font-size: 100px;"></i>
+					<div style="height: 30px; vertical-align: middle;padding-top: 14px;margin-top: 38px">学生成绩列表</div>
+				</div>
+			</a>
+			<a href="javascript:void(0);" onclick="addteb('各班级成绩统计','/chengji/bjtj/biaoge/{$kaoshi_id}')" class="x-admin-backlog-body">
+				<div class="layui-col-xs6 layui-col-sm6 layui-col-md3" style="padding-top: 38px; height: 230px;" align="center">
+					<i class="layui-icon layui-icon-tree" style="font-size: 100px;"></i>
+					<div style="height: 30px; vertical-align: middle;padding-top: 14px;margin-top: 38px">各班级成绩统计表</div>
+				</div>
+			</a>
+			<a href="javascript:void(0);" onclick="addteb('各学校成绩统计表','/chengji/njtj/biaoge/{$kaoshi_id}')" class="x-admin-backlog-body">
+				<div class="layui-col-xs6 layui-col-sm6 layui-col-md3" style="padding-top: 38px; height: 230px;" align="center">
+					<i class="layui-icon layui-icon-release" style="font-size: 100px;"></i>
+					<div style="height: 30px; vertical-align: middle;padding-top: 14px;margin-top: 38px">各学校成绩统计表</div>
+				</div>
+			</a>
+			<a href="javascript:void(0);" onclick="addteb('各分数段统计表','/chengji/bjtj/fenshuduan/{$kaoshi_id}')" class="x-admin-backlog-body">
+				<div class="layui-col-xs6 layui-col-sm6 layui-col-md3" style="padding-top: 38px; height: 230px;" align="center">
+					<i class="layui-icon layui-icon-chart" style="font-size: 100px;"></i>
+					<div style="height: 30px; vertical-align: middle;padding-top: 14px;margin-top: 38px">各分数段统计表</div>
+				</div>
+			</a>
+		</div>
+	</div>
+	<div class="layui-container">&nbsp;</div>
+</body>
+<script>
+// 弹窗
+function addteb(title, url, is_refresh = true) {
+	parent.xadmin.add_tab(title, url, is_refresh);
+}
+
+// 弹窗
+function addlayer(title, url, width = '', height = '', max = false) {
+	parent.xadmin.open(title, url, width, height, max);
+}
+
+function tjbanji(url) {
+	// 到服务器去删除数据。
+	$.ajax({
+		url: url,
+		type: 'POST',
+		async: true,
+		data: {
+			kaoshi_id: "{$kaoshi_id}"
+		},
+		beforeSend: function() {
+			$("body").append('<div id="load" style="position:fixed;top:30%;z-index:1200;background:url(__XADMIN__/images/timg.gif) top center no-repeat;width:100%;height:140px;margin:auto auto;"></div>');
+		},
+		complete: function() {
+			$("#load").remove();
+		},
+		success: function(result) {
+			layer.msg(result.msg);
+		},
+		error: function(result) {
+			layer.msg('数据扔半道，回不来啦。', function() {});
+		},
+	});
+}
+
+</script>
+
+</html>

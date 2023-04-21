@@ -1,0 +1,37 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	{volist name="list.data" id="vo"}
+	<div class="layui-form-item">
+		<label for="teacher_name" class="layui-form-label">
+			<span class="x-red">*</span>{$vo.bjSubject.title}
+		</label>
+		<div class="layui-input-block" id="teacher_id{$vo.id}" school_id="{$list.set.school_id|default='0'}">
+		</div>
+		<input type="hidden" id="id{$vo.id}" name="id[]" value="{$vo.id|default=''}">
+	</div>
+	{/volist}
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['createInput', 'form'], function() {
+	var cInput = layui.createInput;
+
+	// 获取学科
+	var xk = '<?php echo json_encode($list["data"]);?>';
+	xk = eval(decodeURIComponent(xk));
+
+	layui.each(xk, function(i, el) {
+		xmselect = cInput.searchTeacher('teacher_id' + el.id, true, 'teacher_id[]');
+	})
+
+});
+
+</script>
+{/block}

@@ -1,0 +1,135 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">管理员管理</a>
+	<a href="">用户管理</a>
+	<a><cite>管理员列表</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="searchval" class="layui-form-label">
+		关键字
+	</label>
+	<div class="layui-input-block">
+		<input type="text" id="searchval" name="searchval" autocomplete="off" class="layui-input" placeholder="输入关键字并回车">
+	</div>
+</div>
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-danger" lay-event="dels">
+			<i class="iconfont">&#xe69d;</i> 批量删除
+		</button>
+		<button class="layui-btn" lay-event="add">
+			<i class="iconfont">&#xe6b9;</i> 添加
+		</button>
+		<button class="layui-btn" lay-event="upload">
+			<i class="iconfont">&#xe71d;</i> 导入数据
+		</button>
+		<button class="layui-btn" lay-event="download">
+			<i class="iconfont">&#xe714;</i> 下载模板
+		</button>
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="detail" title="查看"><i class="layui-icon layui-icon-search"></i></a>
+	<a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+	<a class="layui-btn-xs" lay-event="reset" title="密码重置"><i class="layui-icon layui-icon-password"></i></a>
+	<a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable', 'form'], function() {
+	var table = layui.table,
+		form = layui.form,
+		mytable = layui.mytable;
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'checkbox', fixed: 'left' },
+			{ field: 'xingming', title: '姓名', sort: true, minWidth: 80, fixed: 'left' },
+			{ field: 'sex', title: '性别', minWidth: 80, sort: true },
+			{ field: "shengri", title: '生日', minWidth: 100, sort: true },
+			{ field: 'username', title: '帐号', minWidth: 100, sort: true },
+			{
+				field: 'school_id',
+				title: '所在单位',
+				minWidth: 100,
+				sort: true,
+				templet: function(d) {
+					if (d.adSchool) {
+						return d.adSchool.jiancheng;
+					}
+				}
+			},
+			{ field:'groupnames', title: '用户组', minWidth: 130},
+			{ field: 'phone', title: '联系电话', minWidth: 120, sort: true },
+			{ field: 'denglucishu', title: '登录次数', minWidth: 100, sort: true },
+			{ field: 'lasttime', title: '最后登录时间', minWidth: 180, sort: true },
+			{ field: 'ip', title: '最后登录地址', minWidth: 130, sort: true },
+			{ field: 'status', title: '状态', templet: '#status', minWidth: 100, sort: true },
+			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 140 },
+		]
+	];
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'dels':
+				var checkStatus = table.checkStatus('mytable'); //idmytable 即为基础参数 id 对应的值
+				mytable.delAll(checkStatus, '/admin/index/delete', 'mytable');
+				break;
+			case 'add':
+				xadmin.open('添加管理员', '/admin/index/create', '', '', true);
+				break;
+			case 'upload':
+				xadmin.open('导入管理员', '/admin/index/createall', '600', '300');
+				break;
+			case 'download':
+				window.open("/admin/index/downloadxls");
+				break;
+		};
+	});
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'detail': // 查看
+				xadmin.open(obj.data.xingming + '信息', '/admin/info/read/' + obj.data.id, '', '', true);
+				break;
+			case 'del': // 删除
+				mytable.del(obj, "/admin/index/delete");
+				break;
+			case 'edit': // 编辑
+				xadmin.open('编辑管理员', '/admin/index/edit/' + obj.data.id, '', '', true);
+				break;
+			case 'reset': // 编辑
+				mytable.resetpassword(obj.data.xingming, "/admin/index/resetpassword/" + obj.data.id);
+				break;
+		};
+	});
+});
+
+</script>
+{/block}

@@ -1,0 +1,81 @@
+{extend name=".././view/createhref.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="dwform" method="{$list.set.formpost}" action="{$list.set.url}">
+	<div class="layui-form-item">
+		<label for="kaoshi_id" class="layui-form-label"><span class="x-red">*</span>考试</label>
+		<div class="layui-input-block">
+			<select name="kaoshi_id" id="kaoshi_id" lay-filter="ks">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+		<div class="layui-input-block">
+			<select name="school_id" id="school_id" lay-filter="src">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="ruxuenian" class="layui-form-label"><span class="x-red">*</span>年级</label>
+		<div class="layui-input-block">
+			<select name="ruxuenian" id="ruxuenian" lay-filter="src">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="subject_id" class="layui-form-label">
+			<span class="x-red">*</span>学科
+		</label>
+		<div class="layui-input-block" id="subject_id">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="banji_id" class="layui-form-label">
+			<span class="x-red">*</span>班级
+		</label>
+		<div class="layui-input-block" id="banji_id">
+		</div>
+	</div>
+	<div class="layui-form-item" style="text-align: center;">
+		<button class="layui-btn" lay-filter="download" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+// 日期控件
+layui.use(['form', 'canyuKaoshi', 'createInput'], function() {
+	var form = layui.form,
+		canyu = layui.canyuKaoshi,
+		cInput = layui.createInput;
+
+	canyu.kaoshiSelect('kaoshi_id');
+
+	// 监听学校下拉菜单
+	form.on('select(ks)', function(data) {
+		data = form.val("dwform");
+		if (data.kaoshi_id > 0) {
+			canyu.schoolSelect('school_id', data.kaoshi_id);
+			canyu.gradeSelect('ruxuenian', data.kaoshi_id);
+		}
+	});
+
+	// 监听学校下拉菜单
+	form.on('select(src)', function(data) {
+		data = form.val("dwform");
+		if (data.kaoshi_id > 0 && data.school_id > 0 && data.ruxuenian > 0) {
+			canyu.banjiCheckbox('banji_id', data);
+			canyu.subjectCheckbox('subject_id', data);
+		}
+	});
+
+	form.on('checkbox(mycheackbox)', function(data) {
+		cInput.checkboxChecked(data);
+	});
+
+});
+
+</script>
+{/block}

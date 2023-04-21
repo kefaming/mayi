@@ -1,0 +1,64 @@
+{extend name=".././view/create.html" /}
+{block name="jscss"}
+{/block}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			<span class="x-red">*</span>课题册标题
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="title" name="title" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="中文1-100个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="category_id" class="layui-form-label">
+			<span class="x-red">*</span>课题类别</label>
+		<div class="layui-input-block">
+			<select name="category_id" id="category_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="lxdanwei_id" class="layui-form-label">
+			<span class="x-red">*</span>立项单位</label>
+		<div class="layui-input-block">
+			<select name="lxdanwei_id" id="lxdanwei_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="lxshijian" class="layui-form-label">
+			<span class="x-red">*</span>获奖时间
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="lxshijian" name="lxshijian" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.lxshijian|default=''}" placeholder="立项时间">
+		</div>
+	</div>
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+// 日期控件
+layui.use(['laydate', 'createInput'], function() {
+	var laydate = layui.laydate,
+		cInput = layui.createInput;
+
+	// 加载菜单
+	cInput.categorySelect('category_id', 115, "{$list.data.category_id|default=''}");
+	cInput.schoolSelect('lxdanwei_id', '区级', '其它级', "{$list.data.lxdanwei_id|default=''}");
+
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#lxshijian', //指定元素
+		trigger: 'click' //采用click弹出
+	});
+});
+
+</script>
+{/block}

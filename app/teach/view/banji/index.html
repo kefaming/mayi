@@ -1,0 +1,228 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">教务管理</a>
+	<a href="">班级管理</a>
+	<a><cite>班级列表</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+	<div class="layui-input-block">
+		<select name="school_id" id="school_id">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="ruxuenian" class="layui-form-label">年级</label>
+	<div class="layui-input-block">
+		<select id="ruxuenian" name="ruxuenian" lay-verify="required">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-danger" lay-event="dels">
+			<i class="iconfont">&#xe69d;</i> 批量删除
+		</button>
+		<button class="layui-btn" lay-event="add">
+			<i class="iconfont">&#xe6b9;</i> 添加
+		</button>
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="detail" title="成绩">
+		<i class="layui-icon layui-icon-chart-screen"></i>
+	</a>
+	<a class="layui-btn-xs" lay-event="banzhuren" title="班主任">
+		<i class="layui-icon layui-icon-username"></i>
+	</a>
+  <a class="layui-btn-xs" lay-event="student" title="学生名单">
+    <i class="layui-icon layui-icon-group"></i>
+  </a>
+	<a class="layui-btn-xs" lay-event="befo" title="前移">
+		<i class="layui-icon">&#xe603;</i></a>
+	<a class="layui-btn-xs" lay-event="end" title="后移">
+		<i class="layui-icon">&#xe602;</i>
+	</a>
+	<a class="layui-btn-xs" lay-event="del" title="删除">
+		<i class="layui-icon">&#xe640;</i>
+	</a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable', 'createInput', 'form'], function() {
+	var table = layui.table,
+		mytable = layui.mytable,
+		form = layui.form,
+		cInput = layui.createInput;
+
+	cInput.schoolSelect('school_id', '校级', '校级');
+	cInput.nanjiSelect('ruxuenian');
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'checkbox', fixed: 'left' },
+			{ field: 'id', title: 'ID', minWidth: 50, sort: true, fixed:'left' },
+			{field: 'banjiTitle',title: '班级名称',minWidth: 100, fixed:'left'},
+			{ field: 'alias', title: '别名', minWidth: 60, edit: 'text' },
+			{
+				field: 'banzhuren',
+				title: '班主任',
+				sort: false,
+				minWidth: 90,
+				templet: function(d) {
+					var str = '';
+					if (d.bzr) {
+						str = d.bzr;
+					}
+					return str;
+				}
+			},
+			{
+				field: 'school_id',
+				title: '单位名称',
+				sort: true,
+				minWidth: 240,
+				templet: function(d) {
+					var str = '';
+					if (d.glSchool) {
+						str = d.glSchool.title;
+					}
+					return str;
+				}
+			},
+			{ field: "ruxuenian", title: '入学年', sort: true, minWidth:90 },
+			{ field: 'paixu', title: '排序', sort: true },
+			{ field: "gl_student_count", title: '学生数', sort: true, minWidth:90 },
+			{ field: 'status', title: '状态', templet: '#status', sort: true },
+			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 200}
+		]
+	];
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'dels':
+				layer.msg('暂时不允许删除');
+				break;
+				var checkStatus = table.checkStatus('mytable'); //idmytable 即为基础参数 id 对应的值
+				mytable.delAll(checkStatus, '/teach/banji/delete', 'mytable');
+				break;
+			case 'add':
+				xadmin.open('添加班级', '/teach/banji/create', '600', '300');
+				break;
+		};
+	});
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'detail': // 查看
+				parent.xadmin.add_tab(obj.data.banjiTitle + '－考试成绩', '/teach/banjicj/index/' + obj.data.id, '', '', true);
+				break;
+			case 'befo': // 前移
+				yidong(this, '/teach/banji/yidong/' + data.id, -1);
+				break;
+			case 'end': // 后移
+				yidong(this, '/teach/banji/yidong/' + data.id, 1);
+				break;
+			case 'del': // 删除
+				// layer.msg('暂时不允许删除');
+				// break;
+				layer.confirm('删除班级会造成数据混乱，确定要继续吗？', { btn: ['我确定！', '再想想'] }, 
+					function () {
+						mytable.del(obj, "/teach/banji/delete");
+					},
+					function (){}
+				);
+				break;
+			case 'edit': // 编辑
+				xadmin.open('编辑班级', '/teach/banji/edit/' + obj.data.id, '600', '300');
+				break;
+			case 'banzhuren': //编辑
+				parent.xadmin.add_tab(obj.data.banjiTitle + ' 班主任', '/teach/banzhuren/index/' + obj.data.id, '', '', true);
+				break;
+      case 'student': //编辑
+        parent.xadmin.add_tab(obj.data.banjiTitle + ' 学生名单', '/teach/banji/student/' + obj.data.id, '', '', true);
+        break;
+		};
+	});
+
+	// 单元格编辑
+	table.on('edit(mytable)', function(obj) {
+		// 声明变量
+		var value = obj.value,
+			rowdata = obj.data;
+		// 修改服务器数据
+		$.ajax({
+			url: "/teach/banji/alias",
+			type: 'PUT',
+			data: {
+				"id": rowdata.id,
+				'alias': value
+			},
+			success: function(result, obj) {
+				layer.msg(result.msg);
+			},
+			error: function(result) {
+				layer.msg('数据扔半道啦。', function() {});
+			},
+		});
+	});
+});
+
+/*班级移动*/
+function yidong(obj, url, caozuo) {
+	layer.confirm('确认要移动班级位置吗？', function(index) {
+		$.ajax({
+			type: 'POST',
+			url: url,
+			data: {
+				cz: caozuo,
+			},
+			dataType: 'json',
+			success: function(data) {
+				if (data.val == 0) {
+					layer.alert(data.msg);
+					return true;
+				}
+				var yd = $(obj).parents("tr");
+				var mytitle = $(yd).find('td[data-field="banjiTitle"]').children('div');
+				var paixu = $(yd).find('td[data-field="paixu"]').children('div');
+				mytitle.text(data.title);
+				paixu.text(data.paixu);
+				layer.msg(data.msg);
+				return true;
+			},
+			error: function(data) {
+				layer.msg('移动失败');
+			},
+		});
+	});
+}
+
+</script>
+{/block}

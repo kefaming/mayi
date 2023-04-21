@@ -1,0 +1,45 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			<span class="x-red">*</span>项目名称
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="title" name="title" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="2-25个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="biaoshi" class="layui-form-label">
+			<span class="x-red">*</span>标识
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="biaoshi" name="biaoshi" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.biaoshi|default=''}" placeholder="1-25个字符" {present name="$list.data.biaoshi" } disabled {/present}>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="paixu" class="layui-form-label">
+			<span class="x-red">*</span>排序
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="paixu" name="paixu" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.paixu|default=''}" placeholder="数字">
+		</div>
+	</div>
+	<div class="layui-form-item" pane>
+		<label for="tongji" class="layui-form-label"><span class="x-red">*</span>是否参与统计</label>
+		<div class="layui-input-block">
+			{if (isset($list.data.tongji)) }
+			<input type="radio" name="tongji" value="1" title="参与" {eq name="$list.data.tongji" value="参与" } checked {/eq}> <input type="radio" name="tongji" value="0" title="不参与" {eq name="$list.data.tongji" value="不参与" } checked {/eq}> {else /} <input type="radio" name="tongji" value="1" title="参与">
+			<input type="radio" name="tongji" value="0" title="不参与" checked>
+			{/if}
+		</div>
+	</div>
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+{/block}

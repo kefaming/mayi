@@ -1,0 +1,96 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			<span class="x-red">*</span>学科名称
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="title" name="title" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="中文2-25个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="jiancheng" class="layui-form-label">
+			<span class="x-red">*</span>简称
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="jiancheng" name="jiancheng" lay-verify="required" autocomplete="off" class="layui-input" value="{$list.data.jiancheng|default=''}" placeholder="中文1-6个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="lieming" class="layui-form-label">
+			<span class="x-red">*</span>列标识
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="lieming" name="lieming" lay-verify="required|lieming" autocomplete="off" class="layui-input" value="{$list.data.lieming|default=''}" placeholder="中文1-6个字符" >
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="category_id" class="layui-form-label"><span class="x-red">*</span>学科分类</label>
+		<div class="layui-input-block">
+			<select name="category_id" id="category_id" lay-verify="required">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item" pane>
+		<label for="kaoshi" class="layui-form-label"><span class="x-red">*</span>是否参与考试</label>
+		<div class="layui-input-block">
+			<input type="radio" name="kaoshi" value="1" title="参与" {present name="$list.data.kaoshi" } {$list.data.kaoshi} {eq name="$list.data.kaoshi" value="1" } checked {/eq} {/present}> <input type="radio" name="kaoshi" value="0" title="不参与" {present name="$list.data.kaoshi" } {eq name="list.data.kaoshi" value="0" } checked {/eq} {/present} {notpresent name="$list.data.kaoshi" } checked {/notpresent}> </div> </div> <div class="layui-form-item">
+			<label for="paixu" class="layui-form-label">
+				排序
+			</label>
+			<div class="layui-input-block">
+				<input type="input" id="paixu" name="paixu" lay-verify="" autocomplete="off" class="layui-input" value="{$list.data.paixu|default=999}" placeholder="数字1-999">
+			</div>
+		</div>
+		<div class="layui-form-item" style="text-align: right;">
+			<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+				{$list.set.butname}
+			</button>
+		</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['createInput', 'form'], function() {
+	var cInput = layui.createInput
+		,form = layui.form;
+	cInput.categorySelect('category_id', 110, "{$list.data.category_id|default=''}");
+
+	form.verify({
+		//将用户名是否可用作为验证条件 表单提交时触发
+		lieming: function(value) {
+			console.log(value);
+			var datas = {
+				searchval: value,
+				id: "{$list.data.id|default=''}"
+			};
+			var message = '';
+			$.ajax({
+				type: "POST",
+				url: '/teach/subject/srclieming',
+				async: false, //改为同步请求
+				contentType: 'application/json;charset=UTF-8',
+				data: JSON.stringify(datas),
+				dataType: 'json',
+				success: function(data) {
+					if (data) {
+						if(data.val == 0){
+							message = data.msg
+						}
+					} else {
+						message = data.msg
+					}
+				}
+			});
+			//需要注意 需要将返回信息写在ajax方法外
+			if (message !== '')
+				return message;
+		},
+	});
+});
+
+	
+
+</script>
+{/block}

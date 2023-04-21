@@ -1,0 +1,129 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<div style="font-size: 18px; margin: 10px; line-height:24px;">
+  同步前先看说明。
+</div>
+<br>
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item" style="text-align: left;">
+		<button type="button" class="layui-btn" onclick="checkAll()">
+			{$list.set.butname}
+		</button>
+	</div>
+	<table class="layui-table">
+		<colgroup>
+			<col width="10px">
+			<col width="200px">
+			<col width="80px">
+			<col>
+			<col>
+		</colgroup>
+		<thead>
+			<tr>
+				<th>序号</th>
+				<th>统计项目</th>
+				<th>统计开关</th>
+				<th>统计状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			{volist name="$list['tjxm']" id="vo"}
+			<tr>
+				<td>{$i}</td>
+				<td>{$vo.title}</td>
+				<td>
+					<input type="checkbox" name="tj" lay-skin="switch" lay-text="开启|关闭" {$vo.checked}>
+				</td>
+				<td id="showtd{$i}">等待统计</i></td>
+				<td><a href="javascript:;" title="同步" onclick="tongji(this)" url="{$vo.url}" val="{$i}"><i class="layui-icon layui-icon-form"></i></a></td>
+			</tr>
+			{/volist}
+		</tbody>
+	</table>
+  <div style="font-size: 14px; margin: 10px; line-height:24px;">
+    说明：<br>
+    从v1.3.7.1版本（472657f--2021-01-04 14:20提交）升级到v1.3.8版本指导。<p>
+    在 Git 中输入更新代码命令：git pull https://gitee.com/dlbz/shangma.git master  更新最新代码。不会的可以参考<a target="_blank" href="https://www.kancloud.cn/llblax/abcd/789224"> 项目更新</a>
+    本次升级两种情况：
+    <br>
+    一、是从1.3.7直接升级到1.3.8。
+    <p>
+      需要用到两条命令:
+      <br>
+      php think migrate:run     升级表结构<br>
+      php think seed:run     重新导入基础数据。
+      <br>
+      在重新导入基础数据的时候，会重新写入部分表数据，但不包括cj_category表，cj_category需要提前手动删除原来的数据，再运行第二条命令。
+      <br>
+      <br>
+    二、已经提前升级auth分支或者与1.3.7更以前的版本
+    <br>
+      新建数据库，用上面两条命令在新数据库中建表结构与数据，然后用新数据库同步旧数据库。
+      <br>
+      <br>
+    <p>
+    三、同步信息：<br>
+    因为1.3.8版本将管理员与教师合并了，所以在表结构与基础数据升级后需要将教师信息同步到管理员，必须先同步教师信息，其它信息不分先后。
+    <br>同步教师信息遵循下面原则。
+    <br>1、教师信息与管理员信息已经有关联cj_admin表中teacher_id字段：使用教师信息替换管理员信息(不包括密码)；<br>2、教师与管理员信息未关联，在管理员表中创建教师信息。帐号为手机号，密码为原密码。原来cj_admin表中数据不变。
+    <br>
+    下次升级将删除本页、cj_teacher表和部分不用的字段。
+    <br>
+    <br>
+    四、可能会遇到的情况
+    <br>
+    1、唯一字段：管理员的帐号、手机号。如果因为是唯一字段给出错误提示，可以将冲突字段的唯一限制取消，再导入。
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+  </div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+function checkAll() {
+	layer.msg('自己一个一个点吧~~嘎嘎--');
+	return false;
+}
+
+function tongji(obj) {
+	var data;
+	data = {
+		'kaoshi_id': "{$list.set.kaoshi_id}"
+	}
+	var url;
+	url = $(obj).attr('url');
+	var val;
+	val = $(obj).attr('val');
+
+	// 到服务器去删除数据。
+	$.ajax({
+		url: url,
+		type: 'POST',
+		async: true,
+		data: data,
+		beforeSend: function() {
+			$('#showtd' + val).text('正在同步');
+			$('#showtd' + val).append("<i class='layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop'>");
+		},
+		complete: function() {
+			$('#showtd' + val).children("i").remove();
+		},
+		success: function(result) {
+			$('#showtd' + val).text(result.msg);
+		},
+		error: function(result) {
+			$('#showtd' + val).text(result.msg);
+		},
+	});
+}
+
+</script>
+{/block}
+''

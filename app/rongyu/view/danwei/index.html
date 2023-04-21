@@ -1,0 +1,197 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">荣誉管理</a>
+	<a><cite>单位荣誉</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="searchval" class="layui-form-label">
+		关键字
+	</label>
+	<div class="layui-input-block">
+		<input type="text" id="searchval" name="searchval" autocomplete="off" class="layui-input" placeholder="输入关键字并回车">
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="category_id" class="layui-form-label">荣誉类别</label>
+	<div class="layui-input-block">
+		<select name="category_id" id="category_id">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="fzschool_id" class="layui-form-label">颁奖单位</label>
+	<div class="layui-input-block">
+		<select name="fzschool_id" id="fzschool_id">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="hjschool_id" class="layui-form-label">获奖单位</label>
+	<div class="layui-input-block">
+		<select name="hjschool_id" id="hjschool_id">
+		</select>
+	</div> 
+</div>
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-danger" lay-event="dels">
+			<i class="iconfont">&#xe69d;</i> 批量删除
+		</button>
+		<button class="layui-btn" lay-event="add">
+			<i class="iconfont">&#xe6b9;</i> 添加
+		</button>
+		<button class="layui-btn" lay-event="more">
+			<i class="layui-icon">&#xe67c;</i> 批传
+		</button>
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+	<a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable', 'form', 'createInput'], function() {
+	var table = layui.table,
+		form = layui.form,
+		cInput = layui.createInput;
+	mytable = layui.mytable;
+
+	// 填充下拉菜单
+	cInput.categorySelect('category_id', 112);
+	cInput.schoolSelect('fzschool_id', '区级', '其它级');
+	cInput.schoolSelect('hjschool_id', '校级', '区级');
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'checkbox', fixed: 'left' },
+			{ field: 'project', title: '项目名称', sort: true },
+			{ field: 'title', title: '荣誉名称', sort: true, minWidth: 240 },
+			{
+				field: 'hjschool_id',
+				title: '获奖单位',
+				minWidth: 100,
+				sort: true,
+				templet: function(d) {
+					var str = '';
+					if (d.hjSchool) {
+						str = d.hjSchool.jiancheng;
+					}
+					return str;
+				}
+			},
+			{
+				field: "category_id",
+				title: '荣誉类别',
+				minWidth: 100,
+				sort: true,
+				templet: function(d) {
+					var str = '';
+					if (d.lxCategory) {
+						str = d.lxCategory.title;
+					}
+					return str;
+				}
+			},
+			{
+				field: 'jiangxiang_id',
+				title: '奖项',
+				minWidth: 130,
+				sort: true,
+				templet: function(d) {
+					var str = '';
+					if (d.jxCategory) {
+						str = d.jxCategory.title;
+					}
+					return str;
+				}
+			},
+			{
+				field: 'fzschool_id',
+				title: '发证单位',
+				minWidth: 100,
+				sort: true,
+				templet: function(d) {
+					var str = '';
+					if (d.fzSchool) {
+						str = d.fzSchool.jiancheng;
+					}
+					return str;
+				}
+			},
+			{
+				field: 'fzschool_id',
+				title: '荣誉级别',
+				minWidth: 100,
+				templet: function(d) {
+					var str = '';
+					if (d.fzSchool) {
+						str = d.fzSchool.dwJibie.title;
+					}
+					return str;
+				}
+			},
+			{ field: 'fzshijian', minWidth: 100, title: '发证时间', sort: true },
+			{ field: 'status', minWidth: 100, title: '状态', templet: '#status', sort: true },
+			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 140 }
+		]
+	];
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'dels':
+				var checkStatus = table.checkStatus('mytable'); //idmytable 即为基础参数 id 对应的值
+				mytable.delAll(checkStatus, '/rongyu/danwei/delete', 'mytable');
+				break;
+			case 'add':
+				xadmin.open('添加单位荣誉', '/rongyu/danwei/create', '', '', true);
+				break;
+			case 'more':
+				xadmin.open('批传', '/rongyu/danwei/createall', '300', '200');
+				break;
+		};
+	});
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'detail': // 查看
+				layer.msg('查看' + data.id);
+				break;
+			case 'del': // 删除
+				mytable.del(obj, '/rongyudanwei/delete');
+				break;
+			case 'edit': // 编辑
+				xadmin.open('编辑单位荣誉', '/rongyu/danwei/edit/' + obj.data.id, '', '', true);
+				break;
+		};
+	});
+});
+
+</script>
+{/block}

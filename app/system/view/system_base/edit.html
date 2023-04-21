@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+	<meta charset="UTF-8">
+	<title>{$list.set.webtitle}</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+	{load href="__XADMIN__/css/font.css" /}
+	{load href="__XADMIN__/css/xadmin.css" /}
+	{load href="__XADMIN__/js/jquery.min.js" /}
+	{load href="__XADMIN__/lib/layui/layui.js" /}
+	{load href="__XADMIN__/js/xadmin.js" /}
+	{load href="__XADMIN__/js/cookie.js" /}
+	<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+	<!--[if lt IE 9]>
+			<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+			<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+</head>
+
+<body>
+	<div class="x-body">
+		<form class="layui-form layui-form-pane">
+			<div class="layui-form-item">
+				<label for="sys_title" class="layui-form-label">
+					<span class="x-red">*</span>系统名称
+				</label>
+				<div class="layui-input-block">
+					<input type="text" id="sys_title" name="sys_title" required="true" lay-verify="required" autocomplete="off" class="layui-input" value="{$list.data.sys_title|default=''}" placeholder="只能是汉字、字母、数字，多个年级用|分割，不要有空格">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="gradelist" class="layui-form-label">
+					<span class="x-red">*</span>年级列表
+				</label>
+				<div class="layui-input-block">
+					<input type="text" id="gradelist" name="gradelist" required="true" lay-verify="required" autocomplete="off" class="layui-input" value="{$list.data.gradelist|default=''}" placeholder="只能是汉字、字母、数字，多个年级用|分割，不要有空格">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="xuenian" class="layui-form-label">
+					<span class="x-red">*</span>学年划分节点
+				</label>
+				<div class="layui-input-block">
+					<input type="text" id="xuenian" name="xuenian" required="true" lay-verify="required" autocomplete="off" class="layui-input" value="{$list.data.xuenian|default=''}">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="classmax" class="layui-form-label">
+					<span class="x-red">*</span>最多班级数
+				</label>
+				<div class="layui-input-block">
+					<input type="text" id="classmax" name="classmax" required="true" lay-verify="required" autocomplete="off" placeholder="各年级的最多班级数" class="layui-input" value="{$list.data.classmax|default=''}">
+				</div>
+			</div>
+			<div class="layui-form-item" pane>
+				<label for="classalias" class="layui-form-label">
+					<span class="x-red">*</span>班级别名
+				</label>
+				<div class="layui-input-block">
+					<input type="radio" name="classalias" value="1" title="启用" {present name="$list.data.classalias" } {$list.data.classalias} {eq name="$list.data.classalias" value="1" } checked {/eq} {/present}> <input type="radio" name="classalias" value="0" title="禁用" {present name="$list.data.classalias" } {eq name="list.data.classalias" value="0" } checked {/eq} {/present} {notpresent name="$list.data.classalias" } checked {/notpresent}> </div> </div> <div class="layui-form-item" pane>
+					<label for="studefen" class="layui-form-label">
+						<span class="x-red">*</span>成绩显示
+					</label>
+					<div class="layui-input-block">
+						<input type="radio" name="studefen" value="1" title="分数" {present name="$list.data.studefen" } {$list.data.teacherketi} {eq name="$list.data.studefen" value="1" } checked {/eq} {/present}> <input type="radio" name="studefen" value="0" title="等级" {present name="$list.data.studefen" } {eq name="list.data.studefen" value="0" } checked {/eq} {/present} {notpresent name="$list.data.studefen" } checked {/notpresent}> </div> </div> <div class="layui-form-item">
+						<label for="keywords" class="layui-form-label">
+							<span class="x-red">*</span>关键字
+						</label>
+						<div class="layui-input-block">
+							<input type="text" id="keywords" name="keywords" required="true" lay-verify="required" autocomplete="off" class="layui-input" value="{$list.data.keywords|default=''}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label for="description" class="layui-form-label">
+							<span class="x-red">*</span>描述
+						</label>
+						<div class="layui-input-block">
+							<input type="input" id="description" name="description" required="true" lay-verify="required" autocomplete="off" class="layui-input" value="{$list.data.description|default=''}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label for="thinks" class="layui-form-label">
+							<span class="x-red">*</span>感谢
+						</label>
+						<div class="layui-input-block">
+							<input type="input" id="thinks" name="thinks" required="true" lay-verify="required" autocomplete="off" class="layui-input" value="{$list.data.thinks|default=''}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label for="danwei" class="layui-form-label">
+							<span class="x-red">*</span>使用单位
+						</label>
+						<div class="layui-input-block">
+							<input type="input" id="danwei" name="danwei" required="true" lay-verify="required" autocomplete="off" class="layui-input" value="{$list.data.danwei|default=''}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label for="danwei" class="layui-form-label">
+							<span class="x-red">*</span>初如化
+						</label>
+						<div class="layui-input-block">
+							<input type="input" class="layui-input" value="会清除权限、类别、学科、统计项目、系统设置以外的数据，但是会保留超级管理员帐号2个，教师1位，单位1个，学期1个。" readonly="true" style="width: 80%; float: left;">
+							<a href="javascript:;" onclick="resetMayi()" class="layui-btn layui-btn-danger" style="float: left; margin-left: 10px;">初始化</a>
+						</div>
+					</div>
+					<div class="layui-form-item" style="text-align: center;">
+						<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+							设置
+						</button>
+					</div>
+		</form>
+	</div>
+	<script>
+	layui.use(['laydate', 'form'], function() {
+		var form = layui.form,
+			laydate = layui.laydate;
+
+		//执行一个laydate实例
+		laydate.render({
+			elem: '#xuenian', //指定元素
+			trigger: 'click', //采用click弹出
+			format: 'M月d日' //可任意组合
+		});
+
+		//监听提交
+		form.on('submit(mysubmit)', function(data) {
+			$.ajax({
+				url: "{$list.set.url}",
+				type: "{$list.set.formpost}",
+				data: data.field,
+				dataType: 'json',
+				success: function(result) {
+					// 弹出提示
+					layer.msg(result.msg);
+				},
+				error: function(xhr, status, error) {
+
+					layer.msg('数据处理错误', {
+						icon: 2,
+						time: 2000 //2秒关闭（如果不配置，默认是3秒）
+					});
+				}
+			});
+			return false;
+		});
+	});
+
+	// 初始化系统
+	function resetMayi() {
+		layer.confirm('初始化系统会删除原来的数据，确定要继续操作吗？', { btn: ['我确定要继续删除！', '我再想想'] }, function(index) {
+				$.ajax({
+					url: '/system/reset',
+					type: 'POST',
+					dataType: 'json',
+					success: function(result) {
+						// 弹出提示
+						layer.msg(result.msg);
+					},
+					error: function(xhr, status, error) {
+						layer.msg('数据处理错误', {
+							icon: 2,
+							time: 2000 //2秒关闭（如果不配置，默认是3秒）
+						});
+					}
+				});
+			},
+			function (){}
+		)
+		return false;
+	}
+
+	</script>
+</body>
+
+</html>

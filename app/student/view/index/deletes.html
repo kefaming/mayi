@@ -1,0 +1,37 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			文件
+		</label>
+		<div class="layui-input-block">
+			<div class="layui-input-inline" style="min-width: 250px">
+				<input type="text" id="url" name="url" autocomplete="off" class="layui-input " value="{$list.data.url|default=''}" placeholder="地址" readonly>
+			</div>
+			<div class="layui-input-inline" style="min-width: 100px">
+				<button type="button" class="layui-btn" id="upload">
+					<i class="layui-icon">&#xe67c;</i>上传文件
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['createInput'], function() {
+	var cInput = layui.createInput;
+	// 填充下拉菜单
+	cInput.schoolSelect('school_id', '校级', '区级', "{$list.data.school_id|default=''}");
+	// 上传文件
+	cInput.uploadXls('upload', '11101', 'admin', 'url');
+});
+
+</script>
+{/block}

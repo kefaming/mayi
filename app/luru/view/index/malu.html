@@ -1,0 +1,124 @@
+{extend name=".././view/create.html" /}
+<style type="text/css">
+</style>
+{block name="form"}
+<div class="layui-form-item">
+	<input type="text" id="saoma" name="saoma" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="请在这里扫码" style="height: 60px;font-size: 25px">
+</div>
+<div class="layui-row">
+	<div id="xianshi" class="layui-col-md6 layui-col-xs12" style="min-height: 150px; font-size: 20px; border-style:solid; border-width:1px;border-color:#e2e2e2; float: left;">
+		<div style="width: 30%; background-color: #eeeeee; float: left; height: 30px;margin-left: 2px;margin-top: 4px;padding-top: 2px;" align="center">学校</div>
+		<div id="xsschool" style="width: 65%; float: left;margin-top: 4px;margin-left: 10px;padding-top: 2px;border-bottom-style:solid;border-width: 1px;height: 30px;border-color: #e2e2e2" align="center"></div>
+		<div style="width: 30%; background-color: #eeeeee; float: left; height: 30px;margin-left: 2px;margin-top: 2px;padding-top: 2px;" align="center">班级</div>
+		<div id="xsbanji" style="width: 65%; float: left;margin-top: 2px;margin-left: 10px;padding-top: 2px;border-bottom-style:solid;border-width: 1px;height: 30px;border-color: #e2e2e2" align="center"></div>
+		<div style="width: 30%; background-color: #eeeeee; float: left; height: 30px;margin-left: 2px;margin-top: 2px;padding-top: 2px;" align="center">姓名</div>
+		<div id="xsxingming" style="width: 65%; float: left;margin-top: 2px;margin-left: 10px;padding-top: 2px;border-bottom-style:solid;border-width: 1px;height: 30px;border-color: #e2e2e2" align="center"></div>
+		<div style="width: 30%; background-color: #eeeeee; float: left; height: 30px;margin-left: 2px;margin-top: 2px;padding-top: 2px;" align="center">学科</div>
+		<div id="xsxueke" style="width: 65%; float: left;margin-top: 2px;margin-left: 10px;padding-top: 2px;border-bottom-style:solid;border-width: 1px;height: 30px;border-color: #e2e2e2" align="center"></div>
+	</div>
+	<div class="layui-col-md6">
+		<form style="">
+			<div class="layui-form-item">
+				<input type="text" id="defen" name="defen" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.defen|default=''}" placeholder="得分" style="height: 150px;font-size: 90px">
+			</div>
+			<input type="hidden" name="kaohao_id" id="kaohao_id">
+			<input type="hidden" name="subject_id" id="subject_id">
+			<input type="hidden" name="nianji" id="nianji">
+		</form>
+	</div>
+</div>
+{/block}
+{block name="myjs"}
+<script>
+$('#saoma').keypress(function(event) {
+	$('#xsschool').text('');
+	$('#xsbanji').text('');
+	$('#xsxingming').text('');
+	$('#xsxueke').text('');
+	$('#kaohao_id').val('');
+	$('#subject_id').val('');
+	$('#defen').val('');
+
+	var keycode = (event.keyCode ? event.keyCode : event.which);
+	if (keycode == '13') {
+		// 查询并显示学生信息
+		$.ajax({
+			type: 'POST',
+			url: "/luru/index/read",
+			data: {
+				val: $('#saoma').val()
+			},
+			dataType: 'json',
+			success: function(data) {
+				if (data.val == 1) {
+					data = data.data;
+					$('#xsschool').text(data.cjSchool.jiancheng);
+					$('#xsbanji').text(data.cjBanji.banjiTitle);
+					$('#xsxingming').text(data.cjStudent['xingming']);
+					$('#xsxueke').text(data.subjectName.title);
+
+					$('#kaohao_id').val(data.id);
+					$('#subject_id').val(data.subjectName.id);
+					$('#nianji').val(data.cjBanji.ruxuenian);
+					if (data.chengji) {
+						$('#defen').val(data.chengji.defen);
+					}
+					$('#saoma').val('');
+					$('#defen').focus();
+				} else {
+					layer.msg(data.msg);
+				}
+			},
+			error: function(data) {
+				layer.msg('数据走丢了');
+			},
+		});
+	}
+});
+
+$('#defen').keypress(function(event) {
+	var keycode = (event.keyCode ? event.keyCode : event.which);
+	if (keycode == '13') {
+		// 查询并显示学生信息
+		$.ajax({
+			type: 'PUT',
+			url: "/luru/index/malusave",
+			data: {
+				subject_id: $('#subject_id').val(),
+				kaohao_id: $('#kaohao_id').val(),
+				defen: $('#defen').val(),
+				nianji: $('#nianji').val()
+			},
+			dataType: 'json',
+			success: function(data) {
+				if (data.val == 1) {
+					$('#kaohao_id').val('');
+					$('#subject_id').val('');
+					$('#nianji').val('');
+					$('#defen').val('');
+					$('#xsschool').text('');
+					$('#xsbanji').text('');
+					$('#xsxingming').text('');
+					$('#xsxueke').text('');
+					$('#saoma').val('');
+					$('#saoma').focus();
+				} else {
+					layer.msg(data.msg);
+				}
+
+			},
+			error: function(data) {
+				layer.msg('数据走丢了');
+			},
+		});
+		return false;
+	}
+});
+
+
+$("#defen").focus(function() {
+	$(this).select();
+});
+
+</script>
+{/block}

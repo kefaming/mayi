@@ -1,0 +1,141 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">考试管理</a>
+	<a href="">任课教师</a>
+	<a><cite>{$list['kaoshititle']}</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+	<div class="layui-input-block">
+		<select name="school_id" id="school_id" lay-filter="src">
+			<option value="">请选择学校</option>
+		</select>
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="ruxuenian" class="layui-form-label">年级</label>
+	<div class="layui-input-block">
+		<select name="ruxuenian" id="ruxuenian" lay-filter="src">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item" style="margin-bottom: 0;">
+	<label for="banji_id" class="layui-form-label" style="height: 100%">班级</label>
+	<div class="layui-input-block" id="banji_id">
+	</div>
+</div>
+<input type="hidden" name="kaoshi_id" value="{$list.kaoshi_id}">
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+<!-- 		<button class="layui-btn layui-btn-danger" lay-event="dels">
+			<i class="iconfont">&#xe69d;</i> 批量删除
+		</button> -->
+		<button class="layui-btn" lay-event="download">
+			<i class="layui-icon layui-icon-download-circle"></i> 设置
+		</button>
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable', 'form', 'canyuKaoshi', 'createInput'], function() {
+	var table = layui.table,
+		mytable = layui.mytable,
+		form = layui.form,
+		cInput = layui.createInput,
+		canyu = layui.canyuKaoshi;
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'numbers', title: '序号', rowspan: 2 },
+			{ field: 'school_jiancheng', title: '学校', sort: false, minWidth: 80 },
+			{ field: 'banji_title', title: '班级', sort: false, minWidth: 100 },
+		]
+	];
+	// 获取学科
+	var xk = '<?php echo json_encode($list["subject_id"]);?>';
+	xk = eval(decodeURIComponent(xk));
+	for (x in xk) {
+		options.cols[0].push({ field: xk[x].lieming, title: xk[x].title, minWidth: 100, sort: false });
+	}
+	options.cols[0].push({ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 140 });
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'dels':
+				break;
+				var checkStatus = table.checkStatus('mytable'); //idmytable 即为基础参数 id 对应的值
+				mytable.delAll(checkStatus, '/school', 'mytable');
+				break;
+			case 'add':
+				xadmin.open('添加单位', '/school/create', '650', '500');
+				break;
+			case 'download':
+				xadmin.open('设置任课班级', '/chengji/bjtj/renkeeditteacher/' + "{$list.kaoshi_id}", '600', '400', false);
+				break;
+		};
+	});
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'detail': // 查看
+				layer.msg('查看' + data.id);
+				break;
+			case 'del': // 删除
+				mytable.del(obj, "/school");
+				break;
+			case 'edit': // 编辑
+				xadmin.open('编辑' + obj.data.banji_title + '任课', '/chengji/bjtj/renkeedit/' + obj.data.id, '650', '500', false);
+				break;
+			case 'status': // 状态
+				mytable.status(obj, "{:url('setstatus')}");
+				break;
+		};
+	});
+
+	canyu.schoolSelect('school_id', "{$list.kaoshi_id}");
+	canyu.gradeSelect('ruxuenian', "{$list.kaoshi_id}");
+
+	form.on('select(src)', function(data) {
+		data = form.val("search");
+		if (data.school_id > 0 && data.ruxuenian > 0) {
+			canyu.banjiCheckbox('banji_id', data);
+		}
+	});
+
+	form.on('checkbox(mycheackbox)', function(data) {
+		cInput.checkboxChecked(data);
+	});
+
+})
+
+</script>
+{/block}

@@ -1,0 +1,54 @@
+{extend name=".././view/create.html" /}
+{block name="jscss"}
+{/block}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			课题册标题
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="title" name="title" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="中文1-100个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="danwei_id" class="layui-form-label">结题单位</label>
+		<div class="layui-input-block">
+			<select name="danwei_id" id="danwei_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="shijian" class="layui-form-label">
+			<span class="x-red">*</span>结题时间
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="shijian" name="shijian" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.shijian|default=''}" placeholder="结题时间">
+		</div>
+	</div>
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+// 日期控件
+layui.use(['laydate', 'createInput'], function() {
+	var laydate = layui.laydate,
+		cInput = layui.createInput;
+
+	// 加载菜单
+	cInput.schoolSelect('danwei_id', '区级', '其它级', "{$list.data.danwei_id|default=''}");
+
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#shijian', //指定元素
+		trigger: 'click' //采用click弹出
+	});
+});
+
+</script>
+{/block}

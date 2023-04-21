@@ -1,0 +1,98 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">教务管理</a>
+	<a href="">班级管理</a>
+	<a><cite>{$list['webtitle']}</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="searchval" class="layui-form-label">
+		关键字
+	</label>
+	<div class="layui-input-block">
+		<input type="text" id="searchval" name="searchval" autocomplete="off" class="layui-input" placeholder="输入关键字并回车">
+	</div>
+</div>
+<div class="layui-form-item">
+	<div class="layui-inline">
+		<label for="title" class="layui-form-label">
+			<span class="x-red">*</span>时间范围
+		</label>
+		<div class="layui-input-inline">
+			<input type="text" class="layui-input" id="betweentime" name="betweentime" placeholder="默认时间为本年度" value="" autocomplete="off" lay-filter="riqi">
+		</div>
+	</div>
+</div>
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="srcSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="echart"}
+<div class="layui-col-xs6 layui-col-sm6 layui-col-md6" style="width:50%; height:400px; margin-top: 45px; margin-bottom: 45px;" id="qgjlx"></div>
+<div class="layui-col-xs6 layui-col-sm6 layui-col-md6" style="width:50%; height:400px; margin-top: 45px; margin-bottom: 45px;" id="qgdwlx"></div>
+<div class="layui-col-xs6 layui-col-sm6 layui-col-md6" style="width:50%; height:400px; margin-top: 45px; margin-bottom: 45px;" id="qgjjt"></div>
+<div class="layui-col-xs6 layui-col-sm6 layui-col-md6" style="width:50%; height:400px; margin-top: 45px; margin-bottom: 45px;" id="qgdwjt"></div>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+  <button class="layui-btn" lay-event="download">
+   <i class="layui-icon layui-icon-download-circle"></i> 下载
+ </button>
+</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<!-- <a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a> -->
+	<!-- <a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a> -->
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable', 'laydate', 'myEchart', 'createInput'], function() {
+	var table = layui.table,
+		mytable = layui.mytable,
+		form = layui.form,
+		laydate = layui.laydate,
+		echart = layui.myEchart;
+
+	//开始时间
+	laydate.render({
+		elem: '#betweentime',
+		type: 'datetime',
+		trigger: 'click', //采用click弹出
+		format: 'yyyy-M-d', //可任意组合
+		range: '～',
+	});
+
+	loadEcharts();
+
+	function loadEcharts()
+	{
+		var val = form.val('search');
+		echart.pubu('qgjlx', '/keti/tongji/qgjlx', val, '全区各级立项课题统计');
+		echart.tiaoxing('qgdwlx', '/keti/tongji/qgdwlx', val, '全区各单位立项课题统计');
+		echart.pubu('qgjjt', '/keti/tongji/qgjjt', val, '全区各级结题课题统计');
+		echart.tiaoxing('qgdwjt', '/keti/tongji/qgdwjt', val, '全区各单位结题课题统计');
+	}
+
+	// 监听筛选
+	form.on('submit(srcSubmit)', function(data) {
+	    options.where = form.val("search");
+	    $('#srcmianban').removeClass("layui-show");
+	    loadEcharts();
+	    return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+	});
+
+});
+
+</script>
+{/block}

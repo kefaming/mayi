@@ -1,0 +1,27 @@
+{extend name=".././view/createhref.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" id="dwform" lay-filter="dwform" method="{$list.set.formpost}" action="{$list.set.url}">
+  <div class="layui-form-item">
+    <label for="kaoshi_id" class="layui-form-label"><span class="x-red">*</span>考试</label>
+    <div class="layui-input-block">
+      <select name="kaoshi_id" id="kaoshi_id" lay-filter="ks" lay-verify="required">
+      </select>
+    </div>
+  </div>
+  <input type="hidden" name="__token__" value="{:token()}" />
+  <div class="layui-form-item" style="text-align: center;">
+    <button class="layui-btn" lay-filter="download" lay-submit="">
+      {$list.set.butname}
+    </button>
+  </div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['canyuKaoshi'], function() {
+  var canyu = layui.canyuKaoshi;
+  canyu.kaoshiSelect('kaoshi_id');
+});
+
+</script>
+{/block}

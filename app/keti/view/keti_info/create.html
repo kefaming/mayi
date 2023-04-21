@@ -1,0 +1,136 @@
+{extend name=".././view/create.html" /}
+{block name="jscss"}
+{/block}
+{block name="form"}
+<div class="layui-form-item" align="center">
+	{eq name="$list.set.formpost" value="PUT" }
+	<img id="img" style="max-height: 300px;max-width: 500px" src="__UPLOAD__/{$list.data.lxpic|default='rongyu_teacher/404.png'}" max="0">
+	{/eq}
+	{eq name="$list.set.formpost" value="POST" }
+	<img id="img" style="max-height: 300px;max-width: 500px" src="" max="0">
+	{/eq}
+</div>
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			图片
+		</label>
+		<div class="layui-inline">
+			<div class="layui-input-inline" style="min-width: 300px">
+				<input type="text" id="lxpic" name="lxpic" autocomplete="off" class="layui-input " value="{$list.data.lxpic|default=''}" placeholder="地址" readonly>
+			</div>
+			<div class="layui-input-inline" style="min-width: 100px">
+				<button type="button" class="layui-btn" id="upload">
+					<i class="layui-icon">&#xe67c;</i>上传图片
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="title" class="layui-form-label">
+			<span class="x-red">*</span>课题标题
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="title" name="title" autocomplete="off" class="layui-input " value="{$list.data.title|default=''}" placeholder="中文1-100个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="bianhao" class="layui-form-label">
+			<span class="x-red">*</span>课题编号
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="bianhao" name="bianhao" autocomplete="off" class="layui-input " value="{$list.data.bianhao|default=''}" placeholder="中文1-50个字符">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="teacher_id" class="layui-form-label">
+			<span class="x-red">*</span>主持人
+		</label>
+		<div class="layui-input-block" id="teacher_id" school_id="">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="fzdanwei_id" class="layui-form-label">
+			<span class="x-red">*</span>负责单位
+		</label>
+		<div class="layui-input-block">
+			<select name="fzdanwei_id" id="fzdanwei_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="category_id" class="layui-form-label" style="height: 100%">
+			<span class="x-red">*</span>所属学科
+		</label>
+		<div class="layui-input-block">
+			<select name="category_id" id="category_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="subject_id" class="layui-form-label" style="height: 100%">
+			<span class="x-red">*</span>研究类型
+		</label>
+		<div class="layui-input-block">
+			<select name="subject_id" id="subject_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="jhjtshijian" class="layui-form-label">
+			<span class="x-red">*</span>结题时间
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="jhjtshijian" name="jhjtshijian" lay-verify="required" autocomplete="off" class="layui-input " value="{$list.data.jhjtshijian|default=''}" placeholder="计划结题时间">
+		</div>
+	</div>
+	<input type="hidden" name="lixiang_id" id="lixiang_id" value="{$list.set.lixiang_id|default=''}">
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+// 日期控件
+layui.use(['laydate','createInput'], function() {
+	var laydate = layui.laydate,
+		cInput = layui.createInput;
+
+	// 填充下拉菜单
+	cInput.schoolSelect('fzdanwei_id', '校级', '区级', "{$list.data.fzdanwei_id|default=''}");
+	cInput.categorySelect('subject_id', 116, "{$list.data.subject_id|default=''}");
+	cInput.categorySelect('category_id', 117, "{$list.data.category_id|default=''}");
+
+	// 搜索教师
+	xmselect = cInput.searchTeacher('teacher_id');
+
+	// 添加已有表单值
+	formpost = "{$list.set.formpost|default=''}".toLocaleUpperCase();
+	if (formpost === 'PUT') {
+		data = {
+			ketiinfo_id: "{$list.data.id|default=''}",
+			category_id: 11901
+		}
+		cInput.loadTeacher(xmselect, '/keti/info/srccy', data);
+	}
+
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#jhjtshijian', //指定元素
+		trigger: 'click' //采用click弹出
+	});
+
+	cInput.uploadPic('upload', "/rongyu/danwei/upload", '课题', 'keti\\lixiang', 'lxpic');
+
+  // 图片放大与缩小
+  $('#img').click(function(){
+    cInput.imgMax(this);
+  })
+
+});
+
+</script>
+{/block}

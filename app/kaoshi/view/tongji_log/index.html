@@ -1,0 +1,98 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">考试管理</a>
+	<a href="">更多操作</a>
+	<a href="">统计结果</a>
+	<a href="">统计结果检测</a>
+	<a><cite>{$list['kaoshititle']}</cite></a>
+</span>
+{/block}
+{block name="search"}
+<input type="hidden" name="kaoshi_id" value="{$list.kaoshi_id}">
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="tongji" title="统计"><i class="layui-icon layui-icon-chart"></i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable'], function() {
+	var table = layui.table
+	mytable = layui.mytable
+	form = layui.form;
+
+	//设置列
+	options.cols = [
+		[ //表头
+			{ field: 'id', type: 'numbers', title: '序号', align: 'center' },
+			{
+				field: 'category_id',
+				title: '统计项目',
+				align: 'center',
+				sort: false,
+				minWidth: 80,
+				rowspan: 2,
+				templet: function(d) {
+					str = '';
+					if (d.tjCategory) {
+						str = d.tjCategory.title;
+					}
+					return str;
+				}
+			},
+			{ field: 'update_time', title: '最后统计时间', align: 'center', sort: false, minWidth: 130, rowspan: 2 },
+			{
+				field: 'cjlast',
+				title: '统计人',
+				align: 'center',
+				sort: false,
+				minWidth: 130,
+				rowspan: 2,
+				templet: function(d) {
+					str = '';
+					if (d.userName) {
+						str = d.userName.xingming;
+					}
+					return str;
+				}
+			},
+			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 80 },
+		]
+	];
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'tongji': // 删除
+				val = {
+					kaoshi_id: obj.data.kaoshi_id,
+				};
+				mytable.tongjiCj(obj.data.url, val);
+				break;
+		};
+	});
+});
+
+</script>
+{/block}

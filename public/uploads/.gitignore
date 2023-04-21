@@ -1,0 +1,16 @@
+/teacher/*
+!/teacher/jiaoShiXingMingVBA.bas
+!/teacher/TeacherInfo.xlsx
+/admin/*
+!/admin/jiaoShiXingMingVBA.bas
+!/admin/AdminInfo.xlsx
+/student/*
+!/student/student_template.xlsx
+/rongyu_school/*
+/rongyu_teacher/*
+!/rongyu_teacher/404.png
+!/rongyu_teacher/js_rongyu.xlsx
+/keti/*
+!/keti/lixiang.xlsx
+!/keti/jieti.xlsx
+/chengji/*

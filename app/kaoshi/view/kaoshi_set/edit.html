@@ -1,0 +1,112 @@
+{extend name=".././view/create.html" /}
+
+{block name="form"}
+    <form class="layui-form layui-form-pane" lay-filter="myform">
+          <div class="layui-form-item">
+            <label for="school" class="layui-form-label"><span class="x-red">*</span>年级</label>
+            <div class="layui-input-block">
+              <input type="text" class="layui-input " value="{$list.data.nianjiname|default=''}" disabled>
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label for="school" class="layui-form-label"><span class="x-red">*</span>学科</label>
+            <div class="layui-input-block">
+              <input type="text" class="layui-input " value="{$list.data.subjectName.title|default=''}" disabled>
+            </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="manfen" class="layui-form-label">
+                  <span class="x-red">*</span>试卷满分
+              </label>
+              <div class="layui-input-block">
+                  <input type="text" id="manfen" name="manfen" lay-verify="required"
+                  autocomplete="off" class="layui-input " value="{$list.data.manfen|default=''}" placeholder="2-25个字符" onchange="addFenShuXian()">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="youxiu" class="layui-form-label">
+                  <span class="x-red">*</span>优秀分数线
+              </label>
+              <div class="layui-input-block">
+                  <input type="text" id="youxiu" name="youxiu" lay-verify="required"
+                  autocomplete="off" class="layui-input " value="{$list.data.youxiu|default=''}" placeholder="2-25个字符">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="lianghao" class="layui-form-label">
+                  <span class="x-red">*</span>良好分数线
+              </label>
+              <div class="layui-input-block">
+                  <input type="text" id="lianghao" name="lianghao" lay-verify="required"
+                  autocomplete="off" class="layui-input " value="{$list.data.lianghao|default=''}" placeholder="2-25个字符">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="jige" class="layui-form-label">
+                  <span class="x-red">*</span>及格分数线
+              </label>
+              <div class="layui-input-block">
+                  <input type="text" id="jige" name="jige" lay-verify="required"
+                  autocomplete="off" class="layui-input " value="{$list.data.jige|default=''}" placeholder="2-25个字符">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="youxiubi" class="layui-form-label">
+                  <span class="x-red">*</span>优秀人数比
+              </label>
+              <div class="layui-input-block">
+                  <input type="text" id="youxiubi" name="youxiubi" lay-verify="required"
+                  autocomplete="off" class="layui-input " value="{$list.data.youxiubi|default=''}" placeholder="0-100">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="lianghaobi" class="layui-form-label">
+                  <span class="x-red">*</span>良好人数比
+              </label>
+              <div class="layui-input-block">
+                  <input type="text" id="lianghaobi" name="lianghaobi" lay-verify="required"
+                  autocomplete="off" class="layui-input " value="{$list.data.lianghaobi|default=''}" placeholder="0-100">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="jigebi" class="layui-form-label">
+                  <span class="x-red">*</span>及格人数比
+              </label>
+              <div class="layui-input-block">
+                  <input type="text" id="jigebi" name="jigebi" lay-verify="required"
+                  autocomplete="off" class="layui-input " value="{$list.data.jigebi|default=''}" placeholder="0-100">
+              </div>
+          </div>
+          <input id="id" name="id" value="{$list.data.id}" type="hidden">
+          <input id="kaoshi_id" name="kaoshi_id" value="{$list.data.kaoshi_id}" type="hidden">
+          <div class="layui-form-item" style="text-align: right;">
+              <button  class="layui-btn" lay-filter="mysubmit" lay-submit="">
+                  {$list.set.butname}
+              </button>
+          </div>
+      </form>
+{/block}
+
+{block name="myjs"}
+<script>
+
+  layui.use(['laydate','form'], function(){
+    var form = layui.form;
+
+    });
+
+  function addFenShuXian()
+  {
+    manfen = $('#manfen').val();
+    var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+    if(regPos.test(manfen)){
+      $('#youxiu').val(Math.round(manfen * 0.9));
+      $('#jige').val(Math.round(manfen * 0.6));
+    }else{
+        layer.msg('请填写整数');
+    }
+  }
+
+</script>
+{/block}
+

@@ -1,0 +1,123 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">系统管理</a>
+	<a><cite>统计项目</cite></a>
+</span>
+{/block}
+{block name="search"}
+<div class="layui-form-item">
+	<label for="searchval" class="layui-form-label">
+		关键字
+	</label>
+	<div class="layui-input-block">
+		<input type="text" id="searchval" name="searchval" autocomplete="off" class="layui-input">
+	</div>
+</div>
+<div class="layui-form-item">
+	<label for="category_id" class="layui-form-label" style="height: 100%">统计类别</label>
+	<div class="layui-input-block">
+		<select name="category_id" id="category_id">
+		</select>
+	</div>
+</div>
+<div class="layui-form-item" style="text-align: right;">
+	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
+</div>
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-danger" lay-event="dels">
+			<i class="iconfont">&#xe69d;</i> 批量删除
+		</button>
+<!-- 		<button class="layui-btn" lay-event="add">
+			<i class="iconfont">&#xe6b9;</i> 新建
+		</button> -->
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+	<a class="layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon layui-icon-edit"></i></a>
+</script>
+<script type="text/html" id="tongji">
+	<input type="checkbox" myurl="{$list.tongji ? $list.tongji : url('tongji')}" {{d.tongji == '参与' ? "checked" :""}} id="{{d.id}}" lay-skin="switch" lay-filter="tongji" lay-text="参与|不参与">
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'mytable', 'createInput', 'form'], function() {
+	var table = layui.table,
+		mytable = layui.mytable,
+		cInput = layui.createInput,
+		form = layui.form;
+
+	cInput.categorySelect('category_id', 122);;
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ type: 'checkbox', fixed: 'left' },
+			{
+				field: 'category_id',
+				title: '类别',
+				sort: true,
+				minWidth: 140,
+				templet: function(d) {
+					var str = '';
+					if (d.tjxmCategory) {
+						str = d.tjxmCategory.title;
+					}
+					return str;
+				}
+			},
+			{ field: 'title', title: '标题', minWidth: 100, sort: true },
+			{ field: 'tongji', title: '参与统计', minWidth: 80, templet: '#tongji', sort: true },
+			{ field: 'paixu', title: '排序', minWidth: 80, sort: true },
+			{ field: 'status', title: '状态', minWidth: 80, templet: '#status', sort: true },
+			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 120 },
+		]
+	];
+
+	// 加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'dels':
+				var checkStatus = table.checkStatus('mytable'); //idmytable 即为基础参数 id 对应的值
+				mytable.delAll(checkStatus, '/kaoshi/tjxm/delete', 'mytable');
+				break;
+			case 'add':
+				xadmin.open('新建项目', '/kaoshi/tjxm/create', '600', '300', false);
+				break;
+		};
+	});
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'del': // 删除
+				mytable.del(obj, "/kaoshi/tjxm/delete");
+				break;
+			case 'edit': // 编辑
+				xadmin.open('编辑项目', '/kaoshi/tjxm/edit/' + obj.data.id, '600', '300', false);
+				break;
+		};
+	});
+});
+
+</script>
+{/block}

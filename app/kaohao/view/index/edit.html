@@ -1,0 +1,94 @@
+{extend name=".././view/create.html" /}
+{block name="form"}
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="xingming" class="layui-form-label">学生姓名</label>
+		<div class="layui-input-block">
+			<input type="text" id="xingming" name="xingming" autocomplete="off" class="layui-input " value="{$list.data.cjStudent.xingming}" placeholder="2-25个字符" disabled>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="stu_banji" class="layui-form-label"><span class="x-red">*</span>班级</label>
+		<div class="layui-input-block">
+			<input type="text" id="stu_banji" name="stu_banji" autocomplete="off" class="layui-input " value="{$list.data.cjStudent.stuBanji.banjiTitle}" placeholder="2-25个字符" disabled>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="cj_banji" class="layui-form-label">
+			成绩现在班级
+		</label>
+		<div class="layui-input-block">
+			<input type="text" id="cj_banji" name="cj_banji" autocomplete="off" class="layui-input " value="{$list.data.banjiTitle}" placeholder="2-25个字符" disabled>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="school_id" class="layui-form-label"><span class="x-red">*</span>成绩目标学校</label>
+		<div class="layui-input-block">
+			<select name="school_id" id="school_id" lay-filter="sch" lay-verify="required">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="ruxuenian" class="layui-form-label"><span class="x-red">*</span>成绩目标年级</label>
+		<div class="layui-input-block">
+			<select name="ruxuenian" id="ruxuenian" lay-filter="nj" lay-verify="required">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="banji_id" class="layui-form-label">
+			<span class="x-red">*</span>成绩目标班级
+		</label>
+		<div class="layui-input-block">
+			<select name="banji_id" id="banji_id" lay-verify="required" class="layui-form-label" lay-filter="bj">
+			</select>
+		</div>
+	</div>
+	<input type="hidden" name="kaoshi_id" id="kaoshi_id" value="{$list.data.kaoshi_id|default=''}">
+	<div class="layui-form-item" style="text-align: right;">
+		<button class="layui-btn" lay-filter="mysubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['form', 'canyuKaoshi', 'createInput'], function() {
+	var form = layui.form,
+		cInput = layui.createInput,
+		canyu = layui.canyuKaoshi;
+
+	cInput.schoolSelect('school_id', '校级', '校级', "", true);
+	canyu.gradeSelect('ruxuenian', "{$list.data.kaoshi_id}");
+
+	// 监听学校下拉菜单
+	form.on('select(sch)', function(data) {
+		data = form.val("myform");
+		if (data.school_id > 0 && data.ruxuenian > 0) {
+			cInput.banjiSelect('banji_id', data);
+		}
+	});
+
+	// 监听学校下拉菜单
+	form.on('select(nj)', function(data) {
+		data = form.val("myform");
+		data.auth = {
+			'guanliyuan' : true
+            ,'zhiwu' : true
+            ,'zuzhang' : true
+            ,'banzhuren' : true
+		}
+		if (data.school_id > 0 && data.ruxuenian > 0) {
+			cInput.banjiSelect('banji_id', data);
+		}
+		$('#nianji').val($('#ruxuenian option:selected').text());
+	});
+	
+
+
+
+});
+
+</script>
+{/block}

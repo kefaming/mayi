@@ -1,0 +1,138 @@
+{extend name=".././view/create.html" /}
+{block name="jscss"}
+<style>
+	.dh {
+      min-height:50px;
+      size:24px;
+      padding-top:10px;
+      text-align:center;
+      min-height: 30px;
+      float: left;
+      margin-right: 1px;
+    }
+    .wancheng {
+      border-bottom: 3px solid #01AAED;
+    }
+
+    .jinxing {
+      border-bottom: 3px solid #FF5722;
+    }
+
+    .weicaozuo {
+      border-bottom: 3px solid #FFB800;
+    }
+  </style>
+{/block}
+{block name="form"}
+<div class="layui-form-item">
+	<div class="dh wancheng" style="width: 10%;">开始</div>
+	<div class="dh wancheng" style="width: 20%;">考试信息</div>
+	<div class="dh wancheng" style="width: 20%;">各年级参加考试学科和分数线</div>
+	<div class="dh jinxing" style="width: 20%;">生成参加考试学生名单</div>
+	<div class="dh weicaozuo" style="width: 20%;">分配录入成绩任务</div>
+	<div class="dh weicaozuo" style="width: 9%;">完成</div>
+</div>
+<form class="layui-form layui-form-pane" lay-filter="myform">
+	<div class="layui-form-item">
+		<label for="school_id" class="layui-form-label">学校</label>
+		<div class="layui-input-block">
+			<select name="school_id" id="school_id">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label for="ruxuenian" class="layui-form-label">年级</label>
+		<div class="layui-input-block">
+			<select name="ruxuenian" id="ruxuenian">
+			</select>
+		</div>
+	</div>
+	<div class="layui-form-item" style="margin-bottom: 0;">
+		<label for="banji_id" class="layui-form-label" style="height: 100%">班级</label>
+		<div class="layui-input-block" id="banji_id">
+		</div>
+	</div>
+	<input type="hidden" name="kaoshi_id" id="kaoshi_id" value="{$list.set.kaoshi_id}">
+	<div class="layui-form-item" style="text-align: right;">
+		<a href="javascript:;" id="preSet" class="layui-btn layui-btn-danger" style="margin-left: 10px;">上一步</a>
+		<button class="layui-btn" lay-filter="kssubmit" lay-submit="">
+			{$list.set.butname}
+		</button>
+		<a href="javascript:;" id="nextSet" class="layui-btn layui-btn-danger" style="margin-left: 10px;">下一步</a>
+	</div>
+</form>
+{/block}
+{block name="myjs"}
+<script>
+layui.use(['form', 'createInput', 'canyuKaoshi'], function() {
+	var form = layui.form,
+		cInput = layui.createInput,
+		canyu = layui.canyuKaoshi;
+
+	cInput.schoolSelect('school_id', '校级', '校级', "{$list.data.school_id|default=''}", true);
+	canyu.gradeSelect('ruxuenian', "{$list.set.kaoshi_id}");
+
+	form.on('select()', function(data) {
+		data = form.val("myform");
+		data.auth = {
+			'guanliyuan' : true
+            ,'zhiwu' : true
+            ,'zuzhang' : true
+            ,'banzhuren' : true
+		}
+		if (data.school_id > 0 && data.ruxuenian > 0) {
+			cInput.banjiCheckbox('banji_id', data);
+		}
+	});
+
+
+	form.on('checkbox(mycheackbox)', function(data) {
+		cInput.checkboxChecked(data);
+	});
+
+
+	//监听提交
+	form.on('submit(kssubmit)', function(data) {
+		$.ajax({
+			url: "{$list.set.url}",
+			type: "{$list.set.formpost}",
+			data: data.field,
+			dataType: 'json',
+			success: function(result) {
+				if (result.val == 1) {
+					// $(location).attr('href', '/kaoshi/kaoshiset/create/' + "{$list['set']['kaoshi_id']}");
+					parent.layer.msg(result.msg);
+				} else {
+					layer.msg(result.msg);
+				}
+			},
+			error: function(xhr, status, error) {
+				layer.msg('数据处理错误', {
+					icon: 2,
+					time: 2000 //2秒关闭（如果不配置，默认是3秒）
+				});
+			}
+		});
+		return false;
+	});
+
+
+
+	$('#preSet').click(function() {
+		$(location).attr('href', '/kaoshi/index/setp2/' + "{$list['set']['kaoshi_id']}");
+		return false;
+	})
+
+
+
+	$('#nextSet').click(function() {
+		$(location).attr('href', '/kaoshi/index/setp4/' + "{$list['set']['kaoshi_id']}");
+		return false;
+	})
+
+
+
+});
+
+</script>
+{/block}

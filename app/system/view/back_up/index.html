@@ -1,0 +1,85 @@
+{extend name=".././view/list.html" /}
+{block name="jsset"}
+{/block}
+{block name="nav"}
+<span class="layui-breadcrumb">
+	<a href="">系统管理</a>
+	<a href="">数据备份</a>
+	<a><cite>备份列表</cite></a>
+</span>
+{/block}
+{block name="search"}
+{/block}
+{block name="table"}
+<table id="tabledemo" lay-filter="mytable" lay-size="sm"></table>
+{/block}
+{block name="myjs"}
+<!-- 表格上面按钮模板 -->
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<button class="layui-btn" lay-event="add">
+			<i class="iconfont">&#xe6b9;</i> 创建备份
+		</button>
+	</div>
+</script>
+<!-- 记录操作按钮模板 -->
+<script type="text/html" id="barDemo">
+	<a class="layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+  <a class="layui-btn-xs" lay-event="huifu" title="恢复"><i class="layui-icon layui-icon-refresh-1"></i></a>
+  <a class="layui-btn-xs" lay-event="down" title="下载"><i class="layui-icon layui-icon-download-circle"></i></a>
+</script>
+<!-- 表格操作 -->
+<script>
+// 提交搜索条件后重载表格
+layui.use(['table', 'backUp', 'form'], function() {
+	var table = layui.table,
+		form = layui.form,
+		backUp = layui.backUp;
+
+	// 设置列
+	options.cols = [
+		[ //表头
+			{ field: 'ltime', type: 'checkbox', fixed: 'left' },
+			{ field: 'time', title: '时间', sort: true, minWidth: 100, fixed: 'left'},
+			{ field: 'part', title: '卷数', sort: true, minWidth: 100 },
+			{ field: 'compress', title: '压缩', sort: true, minWidth: 100 },
+			{ field: 'size', title: '文件大小', minWidth: 100, sort: true },
+			{ field: 'status', title: '状态', minWidth: 100 },
+			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 90}
+		]
+	];
+
+	// 获取筛选条件并加载表格
+	options.where = form.val("search");
+	userTable = table.render(options); //获取数据并渲染
+
+	//表头工具栏事件
+	table.on('toolbar(mytable)', function(obj) {
+		switch (obj.event) {
+			case 'add': // 删除
+				backUp.post();
+				break;
+		};
+	});
+
+	//监听行工具条
+	table.on('tool(mytable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		var tr = obj.tr; //获得当前行 tr 的DOM对象
+		switch (layEvent) {
+			case 'del': // 删除
+				backUp.del('/system/backup/delete/' + obj.data.ltime);
+				break;
+			case 'huifu': // 删除
+				backUp.back('/system/backup/import', this, obj.data.ltime);
+				break;
+			case 'down': // 删除
+				window.open("/system/backup/down/" + obj.data.ltime);
+				break;
+		};
+	});
+});
+
+</script>
+{/block}
