@@ -178,7 +178,7 @@ class Chengji extends BaseModel
                                 $query->field('id, jiancheng, paixu');
                             }
                             ,'cjStudent' => function($query){
-                                $query->field('id, xingming, sex');
+                                $query->field('id, xingming, sex, xuehao');
                             }
                             ,'cjKaoshi' => function($query){
                                 $query->field('id, title');
@@ -200,6 +200,7 @@ class Chengji extends BaseModel
                     $data[$key]['kaoshi_id'] =  $value->cjKaohao->cjKaoshi->id;
                 }
                 $data[$key]['kaohao_id'] = $value->cjKaohao->id;
+                $data[$key]['xuehao'] = $value->cjKaohao->xuehao;
                 $data[$key]['school_jiancheng'] = $value->cjKaohao->cjSchool->jiancheng;
                 $data[$key]['school_id'] = $value->cjKaohao->cjSchool->paixu;
                 $data[$key]['banji_title'] = $value->cjKaohao->banjiTitle;
@@ -225,7 +226,9 @@ class Chengji extends BaseModel
         }
         // halt($src['order']);
 
-        $data = \app\facade\Tools::sortArrByManyField($data, $src['field'], $src['order']);
+        // $data = \app\facade\Tools::sortArrByManyField($data, $src['field'], $src['order']);
+        $data = \app\facade\Tools::sortArrByManyField($data, 'banji_id', SORT_ASC, 'xuehao', SORT_ASC);
+
         if($src['all'] != true)
         {
             $start = ($src['page'] - 1) * $src['limit'];

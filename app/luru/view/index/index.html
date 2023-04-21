@@ -35,6 +35,57 @@
 		</select>
 	</div>
 </div>
+<div class="layui-form-item">
+  <label for="subject_id" class="layui-form-label">学科</label>
+  <div class="layui-input-block">
+    <select name="subject_id" id="subject_id">
+      <option></option>
+      {foreach $subject as $key=>$vo}
+      <option value="{$vo.id}">{$vo.title}</option>
+      {/foreach}
+    </select>
+  </div>
+</div>
+
+
+<div class="layui-form-item">
+  <label for="kaoshi_id" class="layui-form-label"><span class="x-red">*</span>考试</label>
+  <div class="layui-input-block">
+    <select name="kaoshi_id" id="kaoshi_id" lay-filter="ks" lay-verify="required">
+    </select>
+  </div>
+</div>
+<div class="layui-form-item">
+  <label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
+  <div class="layui-input-block">
+    <select name="school_id" id="school_id" lay-filter="src" lay-verify="required">
+    </select>
+  </div>
+</div>
+<div class="layui-form-item">
+  <label for="ruxuenian" class="layui-form-label"><span class="x-red">*</span>年级</label>
+  <div class="layui-input-block">
+    <select name="ruxuenian" id="ruxuenian" lay-filter="src" lay-verify="required">
+    </select>
+  </div>
+</div>
+<div class="layui-form-item">
+  <label for="subject_id" class="layui-form-label">
+    <span class="x-red">*</span>学科
+  </label>
+  <div class="layui-input-block" id="subject_id">
+  </div>
+</div>
+<div class="layui-form-item">
+  <label for="banji_id" class="layui-form-label">
+    <span class="x-red">*</span>班级
+  </label>
+  <div class="layui-input-block" id="banji_id">
+  </div>
+</div>
+
+
+
 <div class="layui-form-item" style="text-align: right;">
 	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
 </div>
@@ -67,11 +118,29 @@ layui.use(['table', 'mytable', 'form'], function() {
 	options.cols = [
 		[ //表头
 			{ type: 'checkbox', fixed: 'left' },
+      // { field: 'id', title: 'id', sort: true, width: 80 },
+      { field: 'xuehao', title: '学号', sort: true, width: 70 },
+      { field: 'student_name', title: '姓名', sort: true, width: 180 },
+      { field: 'defen', title: '成绩', sort: true, minWidth: 80, width: 100  },
+      {
+        field: 'banji_id',
+        title: '班级',
+        sort: true,
+        templet: function(d) {
+          var str = '';
+          if (d.banji_title) {
+            str = d.banji_title;
+          }
+          return str;
+        },
+        width: 160
+      },
 			{
 				field: 'kaoshi_id',
 				title: '考试',
 				sort: true,
 				minWidth: 180,
+        width: 180,
 				templet: function(d) {
 					var str = '';
 					if (d.kaoshi_title) {
@@ -85,6 +154,7 @@ layui.use(['table', 'mytable', 'form'], function() {
 				title: '学校',
 				sort: true,
 				minWidth: 70,
+        width: 140,
 				templet: function(d) {
 					var str = '';
 					if (d.school_jiancheng) {
@@ -93,19 +163,6 @@ layui.use(['table', 'mytable', 'form'], function() {
 					return str;
 				}
 			},
-			{
-				field: 'banji_id',
-				title: '班级',
-				sort: true,
-				templet: function(d) {
-					var str = '';
-					if (d.banji_title) {
-						str = d.banji_title;
-					}
-					return str;
-				}
-			},
-			{ field: 'student_name', title: '姓名', sort: true },
 			{
 				field: "subject_id",
 				title: '学科',
@@ -118,14 +175,22 @@ layui.use(['table', 'mytable', 'form'], function() {
 					return str;
 				}
 			},
-			{ field: 'defen', title: '得分', sort: true, minWidth: 80 },
-			{ field: 'update_time', title: '修改时间', sort: true, minWidth: 160 },
-			{ field: 'status', title: '状态', templet: '#status', sort: true },
-			{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 70 }
+      { field: 'beizhu', title: '备注', sort: true, minWidth: 120,
+        templet: function(d) {
+          var str = '';
+          if (d.beizhu) {
+            str = d.beizhu;
+          }
+          return str;
+        },
+      },
+			// { field: 'update_time', title: '修改时间', sort: true, minWidth: 160 },
+			// { field: 'status', title: '状态', templet: '#status', sort: true },
+			//{ field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 70 }
 		]
 	];
 	// 设置每页显示条数
-	options.limit = 25;
+	options.limit = 100;
 	options.limits = [25, 50, 75, 100];
 
 	// 获取筛选条件并加载表格
