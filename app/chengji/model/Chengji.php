@@ -27,6 +27,7 @@ class Chengji extends BaseModel
         ,'create_time' =>'int'
         ,'update_time' => 'int'
         ,'delete_time' => 'int'
+        ,'beizhu' =>  'varchar'
         ,'status' =>  'tinyint'
     ];
 
@@ -225,6 +226,7 @@ class Chengji extends BaseModel
                 $data[$key]['subject_lieming'] = $value->subjectName->lieming;
             }
             $data[$key]['defen'] = $value->defen * 1;
+            $data[$key]['beizhu'] = $value->beizhu;
             $data[$key]['status'] = $value->status;
             $data[$key]['update_time'] = $value->update_time;
 

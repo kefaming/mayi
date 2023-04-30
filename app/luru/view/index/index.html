@@ -193,16 +193,8 @@ layui.use(['table', 'mytable', 'form'], function() {
 					return str;
 				}
 			},
-      { field: 'beizhu', title: '备注', sort: true, minWidth: 120,
-        templet: function(d) {
-          var str = '';
-          if (d.beizhu) {
-            str = d.beizhu;
-          }
-          return str;
-        },
-      },
-			// { field: 'update_time', title: '修改时间', sort: true, minWidth: 160 },
+      { field: 'beizhu', title: '备注', sort: true, minWidth: 120  },
+      // { field: 'update_time', title: '修改时间', sort: true, minWidth: 160 },
 			// { field: 'status', title: '状态', templet: '#status', sort: true },
 			// { field: 'id', title: '操作', toolbar: '#barDemo', minWidth: 70 }
 		]
