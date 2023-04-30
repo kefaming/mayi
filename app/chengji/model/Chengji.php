@@ -166,6 +166,13 @@ class Chengji extends BaseModel
                             ->when(count($src['banji_id']) > 0, function ($query) use($src) {
                                 $query->where('banji_id', 'in', $src['banji_id']);
                             })
+                            ->when(strlen($src['searchval']) > 0, function ($query) use($src){
+                                $query->where('student_id', 'in', function ($q) use($src) {
+                                    $q->name('student')
+                                        ->where('xingming', 'like', '%' . $src['searchval'] . '%')
+                                        ->field('id');
+                                });
+                            })
                             ->field('id');
                     })
                     ->field('id');
