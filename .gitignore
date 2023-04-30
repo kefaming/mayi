@@ -1,0 +1,7 @@
+/.idea
+/.vscode
+*.log
+.env
+/public/.user.ini
+/public/.user.ini
+/public/nginx.htaccess
