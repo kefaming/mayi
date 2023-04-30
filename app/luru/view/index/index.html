@@ -24,6 +24,16 @@
     <input type="text" id="kaoshi_id" name="kaoshi_id" autocomplete="off" class="layui-input" placeholder="考试id">
   </div>
 </div>
+<div class="layui-form-item">
+  <label for="banji_id" class="layui-form-label">
+    班级id
+  </label>
+  <div class="layui-input-block" id="banji_id">
+    <input type="checkbox" title="全选" lay-skin="primary" value="" cid="1" lay-filter="mycheackbox"><div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>全选</span><i class="layui-icon layui-icon-ok"></i></div><input type="checkbox" name="banji_id[]" title="六班" value="17" lay-skin="primary" pid="1" lay-filter="mycheackbox"><div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>六班</span><i class="layui-icon layui-icon-ok"></i></div><input type="checkbox" name="banji_id[]" title="七班" value="18" lay-skin="primary" pid="1" lay-filter="mycheackbox"><div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>七班</span><i class="layui-icon layui-icon-ok"></i></div><input type="checkbox" name="banji_id[]" title="八班" value="19" lay-skin="primary" pid="1" lay-filter="mycheackbox"><div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>八班</span><i class="layui-icon layui-icon-ok"></i></div>
+  </div>
+</div>
+
+
 {php}
 	$sbj = new \app\teach\model\Subject;
 	$src = [
@@ -85,10 +95,10 @@
   </div>
 </div>
 <div class="layui-form-item">
-  <label for="banji_id" class="layui-form-label">
+  <label for="banji_id11" class="layui-form-label">
     <span class="x-red">*</span>班级
   </label>
-  <div class="layui-input-block" id="banji_id">
+  <div class="layui-input-block" id="banji_id11">
   </div>
 </div>
 

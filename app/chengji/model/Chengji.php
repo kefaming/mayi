@@ -163,6 +163,9 @@ class Chengji extends BaseModel
                             ->when(strlen($src['kaoshi_id']) > 0, function ($q) use ($src) {
                                 $q->where('kaoshi_id', $src['kaoshi_id']);
                             })
+                            ->when(count($src['banji_id']) > 0, function ($query) use($src) {
+                                $query->where('banji_id', 'in', $src['banji_id']);
+                            })
                             ->field('id');
                     })
                     ->field('id');

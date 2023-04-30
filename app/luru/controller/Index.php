@@ -52,6 +52,7 @@ class Index extends AdminBase
                 ,'subject_id' => ''
                 ,'searchval'
                 ,'kaoshi_id'
+                ,'banji_id'
                 ,'user_id' => session('user_id')
                 ,'all' => false
             ], 'POST');
