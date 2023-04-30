@@ -16,6 +16,14 @@
 		<input type="text" id="searchval" name="searchval" autocomplete="off" class="layui-input" placeholder="按学生姓名查询">
 	</div>
 </div>
+<div class="layui-form-item">
+  <label for="searchval" class="layui-form-label">
+    考试id
+  </label>
+  <div class="layui-input-block">
+    <input type="text" id="kaoshi_id" name="kaoshi_id" autocomplete="off" class="layui-input" placeholder="考试id">
+  </div>
+</div>
 {php}
 	$sbj = new \app\teach\model\Subject;
 	$src = [
@@ -24,37 +32,37 @@
 	];
 	$subject = $sbj->search($src);
 {/php}
-<div class="layui-form-item">
-	<label for="subject_id" class="layui-form-label">学科</label>
-	<div class="layui-input-block">
-		<select name="subject_id" id="subject_id">
-			<option></option>
-			{foreach $subject as $key=>$vo}
-			<option value="{$vo.id}">{$vo.title}</option>
-			{/foreach}
-		</select>
-	</div>
-</div>
-<div class="layui-form-item">
-  <label for="subject_id" class="layui-form-label">学科</label>
-  <div class="layui-input-block">
-    <select name="subject_id" id="subject_id">
-      <option></option>
-      {foreach $subject as $key=>$vo}
-      <option value="{$vo.id}">{$vo.title}</option>
-      {/foreach}
-    </select>
-  </div>
-</div>
+<!--<div class="layui-form-item">-->
+<!--	<label for="subject_id" class="layui-form-label">学科</label>-->
+<!--	<div class="layui-input-block">-->
+<!--		<select name="subject_id" id="subject_id">-->
+<!--			<option></option>-->
+<!--			{foreach $subject as $key=>$vo}-->
+<!--			<option value="{$vo.id}">{$vo.title}</option>-->
+<!--			{/foreach}-->
+<!--		</select>-->
+<!--	</div>-->
+<!--</div>-->
+<!--<div class="layui-form-item">-->
+<!--  <label for="subject_id" class="layui-form-label">学科</label>-->
+<!--  <div class="layui-input-block">-->
+<!--    <select name="subject_id" id="subject_id">-->
+<!--      <option></option>-->
+<!--      {foreach $subject as $key=>$vo}-->
+<!--      <option value="{$vo.id}">{$vo.title}</option>-->
+<!--      {/foreach}-->
+<!--    </select>-->
+<!--  </div>-->
+<!--</div>-->
 
 
-<div class="layui-form-item">
-  <label for="kaoshi_id" class="layui-form-label"><span class="x-red">*</span>考试</label>
-  <div class="layui-input-block">
-    <select name="kaoshi_id" id="kaoshi_id" lay-filter="ks" lay-verify="required">
-    </select>
-  </div>
-</div>
+<!--<div class="layui-form-item">-->
+<!--  <label for="kaoshi_id" class="layui-form-label"><span class="x-red">*</span>考试</label>-->
+<!--  <div class="layui-input-block">-->
+<!--    <select name="kaoshi_id" id="kaoshi_id" lay-filter="ks" lay-verify="required">-->
+<!--    </select>-->
+<!--  </div>-->
+<!--</div>-->
 <div class="layui-form-item">
   <label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
   <div class="layui-input-block">

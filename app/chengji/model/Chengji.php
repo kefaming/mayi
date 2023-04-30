@@ -147,21 +147,22 @@ class Chengji extends BaseModel
         );
         $src = array_cover($srcfrom, $src);
 
-        if($src['user_id'] != 1) {
-            $cjList = $this
-                ->where('user_id', $src['user_id']);
-        }
-
         $cjList = $this
+            ->when($src['user_id'] > 2, function ($query) use($src){
+                $query->where('user_id', $src['user_id']);
+            })
             ->when(strlen($src['subject_id']) > 0, function ($query) use($src){
                 $query->where('subject_id', $src['subject_id']);
             })
-            ->where('kaohao_id', 'in', function ($query) {
+            ->where('kaohao_id', 'in', function ($query) use ($src) {
                 $query
                     ->name('kaohao')
-                    ->where('kaoshi_id', 'in', function ($q) {
+                    ->where('kaoshi_id', 'in', function ($q) use ($src) {
                         $q->name('kaoshi')
                             ->where('status&luru', 1)
+                            ->when(strlen($src['kaoshi_id']) > 0, function ($q) use ($src) {
+                                $q->where('kaoshi_id', $src['kaoshi_id']);
+                            })
                             ->field('id');
                     })
                     ->field('id');
