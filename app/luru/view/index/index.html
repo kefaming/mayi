@@ -9,81 +9,23 @@
 {/block}
 {block name="search"}
 <div class="layui-form-item">
-	<label for="searchval" class="layui-form-label">
-		关键字
-	</label>
-	<div class="layui-input-block">
-		<input type="text" id="searchval" name="searchval" autocomplete="off" class="layui-input" placeholder="按学生姓名查询">
-	</div>
-</div>
-<div class="layui-form-item">
-  <label for="searchval" class="layui-form-label">
-    考试id
-  </label>
+  <label for="kaoshi_id" class="layui-form-label"><span class="x-red">*</span>考试</label>
   <div class="layui-input-block">
-    <input type="text" id="kaoshi_id" name="kaoshi_id" autocomplete="off" class="layui-input" placeholder="考试id">
+    <select name="kaoshi_id" id="kaoshi_id" lay-filter="ks">
+    </select>
   </div>
 </div>
-<div class="layui-form-item">
-  <label for="banji_id" class="layui-form-label">
-    班级id
-  </label>
-  <div class="layui-input-block" id="banji_id">
-    <input type="checkbox" title="全选" lay-skin="primary" value="" cid="1" lay-filter="mycheackbox"><div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>全选</span><i class="layui-icon layui-icon-ok"></i></div><input type="checkbox" name="banji_id[]" title="六班" value="17" lay-skin="primary" pid="1" lay-filter="mycheackbox"><div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>六班</span><i class="layui-icon layui-icon-ok"></i></div><input type="checkbox" name="banji_id[]" title="七班" value="18" lay-skin="primary" pid="1" lay-filter="mycheackbox"><div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>七班</span><i class="layui-icon layui-icon-ok"></i></div><input type="checkbox" name="banji_id[]" title="八班" value="19" lay-skin="primary" pid="1" lay-filter="mycheackbox"><div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>八班</span><i class="layui-icon layui-icon-ok"></i></div>
-  </div>
-</div>
-
-
-{php}
-	$sbj = new \app\teach\model\Subject;
-	$src = [
-		'status' => 1,
-		'kaoshi' => 1
-	];
-	$subject = $sbj->search($src);
-{/php}
-<!--<div class="layui-form-item">-->
-<!--	<label for="subject_id" class="layui-form-label">学科</label>-->
-<!--	<div class="layui-input-block">-->
-<!--		<select name="subject_id" id="subject_id">-->
-<!--			<option></option>-->
-<!--			{foreach $subject as $key=>$vo}-->
-<!--			<option value="{$vo.id}">{$vo.title}</option>-->
-<!--			{/foreach}-->
-<!--		</select>-->
-<!--	</div>-->
-<!--</div>-->
-<!--<div class="layui-form-item">-->
-<!--  <label for="subject_id" class="layui-form-label">学科</label>-->
-<!--  <div class="layui-input-block">-->
-<!--    <select name="subject_id" id="subject_id">-->
-<!--      <option></option>-->
-<!--      {foreach $subject as $key=>$vo}-->
-<!--      <option value="{$vo.id}">{$vo.title}</option>-->
-<!--      {/foreach}-->
-<!--    </select>-->
-<!--  </div>-->
-<!--</div>-->
-
-
-<!--<div class="layui-form-item">-->
-<!--  <label for="kaoshi_id" class="layui-form-label"><span class="x-red">*</span>考试</label>-->
-<!--  <div class="layui-input-block">-->
-<!--    <select name="kaoshi_id" id="kaoshi_id" lay-filter="ks" lay-verify="required">-->
-<!--    </select>-->
-<!--  </div>-->
-<!--</div>-->
 <div class="layui-form-item">
   <label for="school_id" class="layui-form-label"><span class="x-red">*</span>学校</label>
   <div class="layui-input-block">
-    <select name="school_id" id="school_id" lay-filter="src" lay-verify="required">
+    <select name="school_id" id="school_id" lay-filter="src">
     </select>
   </div>
 </div>
 <div class="layui-form-item">
   <label for="ruxuenian" class="layui-form-label"><span class="x-red">*</span>年级</label>
   <div class="layui-input-block">
-    <select name="ruxuenian" id="ruxuenian" lay-filter="src" lay-verify="required">
+    <select name="ruxuenian" id="ruxuenian" lay-filter="src">
     </select>
   </div>
 </div>
@@ -95,15 +37,21 @@
   </div>
 </div>
 <div class="layui-form-item">
-  <label for="banji_id11" class="layui-form-label">
+  <label for="banji_id" class="layui-form-label">
     <span class="x-red">*</span>班级
   </label>
-  <div class="layui-input-block" id="banji_id11">
+  <div class="layui-input-block" id="banji_id">
   </div>
 </div>
 
-
-
+{php}
+	$sbj = new \app\teach\model\Subject;
+	$src = [
+		'status' => 1,
+		'kaoshi' => 1
+	];
+	$subject = $sbj->search($src);
+{/php}
 <div class="layui-form-item" style="text-align: right;">
 	<button class="layui-btn" lay-filter="searchSubmit" lay-submit="">搜索</button>
 </div>
@@ -231,6 +179,39 @@ layui.use(['table', 'mytable', 'form'], function() {
 	});
 
 });
+
+
+// 搜索条件
+layui.use(['form', 'canyuKaoshi', 'createInput'], function() {
+  var form = layui.form,
+  canyu = layui.canyuKaoshi,
+  cInput = layui.createInput;
+  canyu.kaoshiSelect('kaoshi_id');
+
+  // 监听考试下拉菜单
+  form.on('select(ks)', function(data) {
+    data = form.val("search");
+    if (data.kaoshi_id > 0) {
+      canyu.schoolSelect('school_id', data.kaoshi_id);
+      canyu.gradeSelect('ruxuenian', data.kaoshi_id);
+    }
+  });
+
+  // 监听学校及年级下拉菜单
+  form.on('select(src)', function(data) {
+    data = form.val("search");
+    if (data.kaoshi_id > 0 && data.school_id > 0 && data.ruxuenian > 0) {
+      canyu.banjiCheckbox('banji_id', data);
+      canyu.subjectCheckbox('subject_id', data);
+    }
+  });
+
+  form.on('checkbox(mycheackbox)', function(data) {
+    cInput.checkboxChecked(data);
+  });
+
+});
+
 
 </script>
 {/block}
